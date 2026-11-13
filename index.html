@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalinga: Stray Pet Adoption System | Mamburao, Occidental Mindoro</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            cream: {
+              50: '#FDFBF7',
+              100: '#F7F3EB',
+              200: '#EFE6D5',
+            },
+            sage: {
+              50: '#F2F6F3',
+              100: '#E1ECE4',
+              200: '#C4D9CA',
+              500: '#4A7C59',
+              600: '#3B6648',
+              700: '#2E5038',
+            },
+            roseaccent: {
+              50: '#FFF5F5',
+              100: '#FFE3E3',
+              500: '#E53E3E',
+              600: '#C53030',
+            },
+            terracotta: {
+              50: '#FDF4F1',
+              100: '#FAE6DF',
+              500: '#D96B43',
+              600: '#C25630',
+            },
+            earth: {
+              700: '#4A3F35',
+              800: '#332B24',
+              900: '#1F1A16',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #FDFBF7;
+      color: #332B24;
+    }
+    .nav-link-active {
+      color: #2E5038;
+      font-weight: 700;
+      border-bottom: 2px solid #4A7C59;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-slip, #printable-slip * { visibility: visible; }
+      #printable-slip { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 20px; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-roseaccent-100 selection:text-roseaccent-900">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-cream-50/95 backdrop-blur-md border-b border-cream-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('home')">
+          <div class="w-11 h-11 rounded-2xl bg-sage-600 text-white flex items-center justify-center shadow-sm">
+            <i data-lucide="paw-print" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-extrabold text-xl tracking-tight text-earth-900">KALINGA</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-roseaccent-100 text-roseaccent-600">Mamburao</span>
+            </div>
+            <p class="text-xs text-earth-700 hidden sm:block">Stray Pet Adoption & Welfare System</p>
+          </div>
+        </div>
+
+        <!-- Desktop Nav Links -->
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-earth-800">
+          <button onclick="switchView('home')" id="nav-home" class="transition hover:text-sage-700 pb-1">Home</button>
+          <button onclick="switchView('about')" id="nav-about" class="transition hover:text-sage-700 pb-1">About Us</button>
+          <button onclick="switchView('gallery')" id="nav-gallery" class="transition hover:text-sage-700 pb-1">Adopt Pets</button>
+          <button onclick="switchView('contact')" id="nav-contact" class="transition hover:text-sage-700 pb-1">Contact Us</button>
+          <button onclick="switchView('dashboard')" id="nav-dashboard" class="transition hover:text-sage-700 pb-1 hidden">My Applications</button>
+        </nav>
+
+        <!-- Auth / User Actions -->
+        <div class="flex items-center gap-3">
+          <div id="auth-guest-controls" class="flex items-center gap-2">
+            <button onclick="switchView('login')" class="px-4 py-2 rounded-xl text-sm font-semibold text-earth-800 hover:bg-cream-100 transition">Login</button>
+            <button onclick="switchView('register')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-sage-600 hover:bg-sage-700 text-white shadow-sm transition">Register</button>
+          </div>
+          <div id="auth-user-controls" class="hidden flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-sage-50 px-3 py-1.5 rounded-xl border border-sage-100">
+              <div class="w-7 h-7 rounded-full bg-sage-600 text-white flex items-center justify-center text-xs font-bold" id="user-initials">U</div>
+              <span class="text-xs font-semibold text-earth-900" id="user-display-name">User</span>
+            </div>
+            <button onclick="handleLogout()" class="p-2 rounded-xl text-earth-700 hover:bg-roseaccent-50 hover:text-roseaccent-600 transition" title="Log Out">
+              <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <!-- Mobile Menu Toggle -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-cream-100 text-earth-800">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-cream-100 border-b border-cream-200 px-4 py-4 space-y-3">
+      <button onclick="switchView('home'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">Home</button>
+      <button onclick="switchView('about'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">About Us</button>
+      <button onclick="switchView('gallery'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">Adopt Pets</button>
+      <button onclick="switchView('contact'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">Contact Us</button>
+      <button onclick="switchView('dashboard'); toggleMobileMenu()" id="mobile-nav-dashboard" class="hidden block w-full text-left font-medium text-earth-800 py-1.5">My Applications</button>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: HOME PAGE                                                     -->
+  <!-- ===================================================================== -->
+  <div id="view-home" class="flex-1 view-section">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-sage-50 via-cream-50 to-roseaccent-50 py-14 sm:py-20 border-b border-cream-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-800 text-xs font-semibold">
+              <i data-lucide="heart" class="w-3.5 h-3.5 text-roseaccent-500 fill-roseaccent-500"></i>
+              <span>Care, Protection, and Nurturing in Mamburao, Occ. Mindoro</span>
+            </div>
+            <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-earth-900 leading-tight">
+              Give Homeless Strays a Safe Temporary Home & Loving Family.
+            </h1>
+            <p class="text-base sm:text-lg text-earth-700 leading-relaxed max-w-2xl">
+              <strong>Kalinga</strong> is your community-centered adoption initiative. Browse rescued dogs and cats with complete health records, submit adoption applications, or schedule shelter visits online.
+            </p>
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+              <button onclick="switchView('gallery')" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
+                <i data-lucide="paw-print" class="w-4 h-4"></i>
+                <span>Browse Available Pets</span>
+              </button>
+              <button onclick="switchView('about')" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-cream-100 text-earth-800 font-semibold text-sm border border-cream-200 shadow-sm transition">
+                <i data-lucide="book-open" class="w-4 h-4 text-terracotta-600"></i>
+                <span>Our Mission & Story</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Impact Summary Card -->
+          <div class="lg:col-span-5">
+            <div class="bg-white/90 backdrop-blur rounded-3xl p-6 sm:p-8 border border-cream-200 shadow-xl space-y-6">
+              <div class="flex items-center justify-between border-b border-cream-200 pb-4">
+                <div>
+                  <h2 class="font-display font-bold text-lg text-earth-900">Mamburao Shelter Live Stats</h2>
+                  <p class="text-xs text-earth-700">Synchronized community database</p>
+                </div>
+                <span class="w-3 h-3 rounded-full bg-sage-500 animate-pulse"></span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-4 rounded-2xl bg-sage-50 border border-sage-100">
+                  <div id="stat-available" class="font-display font-extrabold text-2xl sm:text-3xl text-sage-700">0</div>
+                  <div class="text-xs font-medium text-earth-700 mt-1">Available</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-cream-100 border border-cream-200">
+                  <div id="stat-rescued" class="font-display font-extrabold text-2xl sm:text-3xl text-earth-900">0</div>
+                  <div class="text-xs font-medium text-earth-700 mt-1">Rescued</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-roseaccent-50 border border-roseaccent-100">
+                  <div id="stat-adopted" class="font-display font-extrabold text-2xl sm:text-3xl text-roseaccent-600">0</div>
+                  <div class="text-xs font-medium text-earth-700 mt-1">Adopted</div>
+                </div>
+              </div>
+
+              <div class="bg-cream-50 rounded-2xl p-4 border border-cream-200 flex items-start gap-3">
+                <i data-lucide="shield-check" class="w-5 h-5 text-sage-600 shrink-0 mt-0.5"></i>
+                <p class="text-xs text-earth-700 leading-relaxed">
+                  Every animal undergoes complete veterinary vaccination, deworming, and temperament screening before being matched with loving families in Occidental Mindoro.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Adoptable Pets Preview -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Ready For Forever Homes</span>
+          <h2 class="font-display font-extrabold text-3xl text-earth-900 mt-2">Meet Our Featured Rescues</h2>
+        </div>
+        <button onclick="switchView('gallery')" class="inline-flex items-center gap-1.5 text-sm font-bold text-sage-700 hover:text-sage-800 transition">
+          <span>View All Pets Gallery</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="home-featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: ABOUT US PAGE                                                 -->
+  <!-- ===================================================================== -->
+  <div id="view-about" class="flex-1 view-section hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
+      <!-- Header -->
+      <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">About Kalinga</span>
+        <h1 class="font-display font-extrabold text-3xl sm:text-5xl text-earth-900">Care, Protection, and Nurturing</h1>
+        <p class="text-base sm:text-lg text-earth-700 leading-relaxed">
+          Kalinga is a community-centered stray pet adoption initiative serving Mamburao and nearby towns in Occidental Mindoro. We give homeless, abandoned, or stray dogs and cats a safe temporary shelter and match them with loving forever families.
+        </p>
+      </div>
+
+      <!-- Story & Problem Addressed -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div class="bg-white p-8 rounded-3xl border border-cream-200 shadow-sm space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-sage-50 text-sage-600 flex items-center justify-center">
+            <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+          </div>
+          <h2 class="font-display font-bold text-2xl text-earth-900">Why Kalinga Was Built</h2>
+          <p class="text-sm text-earth-700 leading-relaxed">
+            Previously, animal rescue efforts in Mamburao relied entirely on handwritten logbooks, scattered social media posts, and physical shelter visits. Interested adopters from distant barangays faced major travel hurdles, and staff struggled with duplicate records. Kalinga digitizes the entire workflow.
+          </p>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl border border-cream-200 shadow-sm space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-roseaccent-50 text-roseaccent-600 flex items-center justify-center">
+            <i data-lucide="target" class="w-6 h-6"></i>
+          </div>
+          <h2 class="font-display font-bold text-2xl text-earth-900">Our Core Objectives</h2>
+          <ul class="space-y-2.5 text-sm text-earth-700">
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-sage-600 shrink-0 mt-0.5"></i> Centralized digital database for rescued animal profiles & medical records.</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-sage-600 shrink-0 mt-0.5"></i> User-friendly public interface to browse pets and submit applications online.</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-sage-600 shrink-0 mt-0.5"></i> Streamlined administrative screening and post-adoption welfare tracking.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Community & Barangays -->
+      <div class="bg-sage-600 text-white rounded-3xl p-8 sm:p-12 space-y-6 text-center">
+        <h2 class="font-display font-extrabold text-2xl sm:text-3xl">Serving Mamburao & Neighboring Barangays</h2>
+        <p class="text-sm sm:text-base text-sage-100 max-w-2xl mx-auto leading-relaxed">
+          From Brgy. Payompon and Poblacion to Balansay, Tayamaan, and Fatima — our volunteers and municipal partners work tirelessly to rescue, rehabilitate, and rehome stray animals across Occidental Mindoro.
+        </p>
+        <div class="pt-2">
+          <button onclick="switchView('gallery')" class="px-6 py-3.5 rounded-2xl bg-white text-sage-800 font-bold text-sm hover:bg-cream-100 transition shadow-sm">
+            Meet Our Rescues Today
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 3: PET GALLERY & ADOPTION PAGE                                   -->
+  <!-- ===================================================================== -->
+  <div id="view-gallery" class="flex-1 view-section hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Adoption Directory</span>
+        <h1 class="font-display font-extrabold text-3xl sm:text-4xl text-earth-900 mt-2">Find Your New Family Member</h1>
+        <p class="text-sm text-earth-700 mt-1">Browse verified health and temperament records of rescued dogs and cats in Mamburao.</p>
+      </div>
+
+      <!-- Filter Controls Bar -->
+      <div class="bg-white p-5 rounded-3xl border border-cream-200 shadow-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-earth-700 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="gallery-search" oninput="renderGalleryPets()" placeholder="Search name, breed, barangay..." class="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+          </div>
+          <div>
+            <select id="gallery-species" onchange="renderGalleryPets()" class="w-full px-3.5 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none">
+              <option value="All">All Species (Dogs & Cats)</option>
+              <option value="Dog">Dogs Only</option>
+              <option value="Cat">Cats Only</option>
+            </select>
+          </div>
+          <div>
+            <select id="gallery-size" onchange="renderGalleryPets()" class="w-full px-3.5 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none">
+              <option value="All">All Sizes</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
+          <div>
+            <select id="gallery-status" onchange="renderGalleryPets()" class="w-full px-3.5 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none">
+              <option value="All">All Statuses</option>
+              <option value="Available" selected>Available for Adoption</option>
+              <option value="Fostered">In Foster Care</option>
+              <option value="Medical Care">Under Medical Care</option>
+              <option value="Adopted">Already Adopted</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pet Cards Grid -->
+      <div id="gallery-pet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 4: CONTACT US PAGE                                               -->
+  <!-- ===================================================================== -->
+  <div id="view-contact" class="flex-1 view-section hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
+      <div class="text-center space-y-4 max-w-2xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Get In Touch</span>
+        <h1 class="font-display font-extrabold text-3xl sm:text-5xl text-earth-900">We’d Love to Hear From You</h1>
+        <p class="text-base text-earth-700">Have questions about adoption, volunteering, or donations in Mamburao? Reach out to our shelter team.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Contact Information Cards -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-sage-50 text-sage-600 flex items-center justify-center shrink-0">
+              <i data-lucide="map-pin" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base text-earth-900">Shelter Location</h3>
+              <p class="text-sm text-earth-700 mt-1">Brgy. Payompon, Mamburao, Occidental Mindoro, Philippines</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-terracotta-50 text-terracotta-600 flex items-center justify-center shrink-0">
+              <i data-lucide="phone" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base text-earth-900">Contact Numbers</h3>
+              <p class="text-sm text-earth-700 mt-1">+63 917-555-0192 / +63 928-440-3321</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-roseaccent-50 text-roseaccent-600 flex items-center justify-center shrink-0">
+              <i data-lucide="mail" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base text-earth-900">Email Address</h3>
+              <p class="text-sm text-earth-700 mt-1">kalinga.mamburao@gmail.com</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-cream-100 text-earth-800 flex items-center justify-center shrink-0">
+              <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base text-earth-900">Visiting Hours</h3>
+              <p class="text-sm text-earth-700 mt-1">Monday – Saturday: 8:00 AM – 5:00 PM</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Message Form -->
+        <div class="lg:col-span-7 bg-white p-8 sm:p-10 rounded-3xl border border-cream-200 shadow-sm">
+          <h2 class="font-display font-bold text-xl text-earth-900 mb-4">Send Us a Message</h2>
+          <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-earth-800 mb-1">Your Full Name *</label>
+                <input type="text" required placeholder="Maria Santos" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
+                <input type="email" required placeholder="maria@example.com" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Subject *</label>
+              <input type="text" required placeholder="Inquiry about pet adoption / volunteering" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Message *</label>
+              <textarea rows="4" required placeholder="Type your message here..." class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
+              Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 5: LOGIN PAGE                                                    -->
+  <!-- ===================================================================== -->
+  <div id="view-login" class="flex-1 view-section hidden flex items-center justify-center py-12 px-4">
+    <div class="bg-white p-8 sm:p-10 rounded-3xl border border-cream-200 shadow-xl max-w-md w-full space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-sage-600 text-white flex items-center justify-center mx-auto shadow-sm">
+          <i data-lucide="paw-print" class="w-6 h-6"></i>
+        </div>
+        <h2 class="font-display font-extrabold text-2xl text-earth-900">Welcome Back to Kalinga</h2>
+        <p class="text-xs text-earth-700">Log in to track your adoption applications and appointment slips.</p>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
+          <input type="email" id="login-email" required placeholder="e.g., maria@example.com" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Password *</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
+          Log In
+        </button>
+      </form>
+
+      <div class="text-center text-xs text-earth-700 border-t border-cream-200 pt-4">
+        Don't have an account yet? <button onclick="switchView('register')" class="font-bold text-sage-700 hover:underline">Register here</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 6: REGISTER PAGE                                                 -->
+  <!-- ===================================================================== -->
+  <div id="view-register" class="flex-1 view-section hidden flex items-center justify-center py-12 px-4">
+    <div class="bg-white p-8 sm:p-10 rounded-3xl border border-cream-200 shadow-xl max-w-md w-full space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-roseaccent-600 text-white flex items-center justify-center mx-auto shadow-sm">
+          <i data-lucide="user-plus" class="w-6 h-6"></i>
+        </div>
+        <h2 class="font-display font-extrabold text-2xl text-earth-900">Create Adopter Account</h2>
+        <p class="text-xs text-earth-700">Join Kalinga to rescue and adopt stray animals in Occidental Mindoro.</p>
+      </div>
+
+      <form onsubmit="handleRegisterSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Full Legal Name *</label>
+          <input type="text" id="reg-name" required placeholder="Maria Clara Santos" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
+          <input type="email" id="reg-email" required placeholder="maria@example.com" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Password *</label>
+          <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
+          Create Account
+        </button>
+      </form>
+
+      <div class="text-center text-xs text-earth-700 border-t border-cream-200 pt-4">
+        Already have an account? <button onclick="switchView('login')" class="font-bold text-sage-700 hover:underline">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 7: MY APPLICATIONS DASHBOARD                                     -->
+  <!-- ===================================================================== -->
+  <div id="view-dashboard" class="flex-1 view-section hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">User Portal</span>
+          <h1 class="font-display font-extrabold text-3xl text-earth-900 mt-2">My Adoption Applications</h1>
+          <p class="text-sm text-earth-700 mt-1">Track your pending requests, shelter visit slips, and completed adoptions.</p>
+        </div>
+        <button onclick="switchView('gallery')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-sage-600 text-white text-sm font-semibold shadow-sm">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Adopt Another Pet</span>
+        </button>
+      </div>
+
+      <div id="dashboard-applications-list" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: PET FULL PROFILE & ADOPTION APPLICATION                        -->
+  <!-- ===================================================================== -->
+  <div id="modal-pet-detail" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
+      <div class="px-6 py-4 bg-cream-50 border-b border-cream-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span id="detail-pet-id" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-earth-800 text-white">KLG-001</span>
+          <span id="detail-pet-status" class="text-xs font-semibold px-2.5 py-1 rounded-full">Available</span>
+        </div>
+        <button onclick="closeModal('modal-pet-detail')" class="p-2 rounded-xl hover:bg-cream-200 text-earth-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="detail-pet-content" class="p-6 overflow-y-auto space-y-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: APPLICATION FORM                                               -->
+  <!-- ===================================================================== -->
+  <div id="modal-apply" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
+      <div class="px-6 py-4 bg-sage-700 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-lg">Kalinga Adoption Application</h3>
+          <p id="apply-pet-subtitle" class="text-xs text-sage-100">Applying for Pet</p>
+        </div>
+        <button onclick="closeModal('modal-apply')" class="p-2 rounded-xl hover:bg-sage-600 text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="adoption-form" onsubmit="handleAdoptionSubmit(event)" class="p-6 overflow-y-auto space-y-4">
+        <input type="hidden" id="apply-pet-id" />
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-earth-700 mb-2">1. Engagement Method *</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="cursor-pointer border-2 rounded-2xl p-3.5 flex items-start gap-3 transition has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 border-cream-200">
+              <input type="radio" name="adoptionMethod" value="Online Direct Application" checked onchange="toggleVisitDate()" class="mt-1 accent-sage-600" />
+              <div>
+                <div class="font-semibold text-sm text-earth-900">Online Direct Application</div>
+                <div class="text-xs text-earth-700 mt-0.5">Complete screening remotely.</div>
+              </div>
+            </label>
+            <label class="cursor-pointer border-2 rounded-2xl p-3.5 flex items-start gap-3 transition has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 border-cream-200">
+              <input type="radio" name="adoptionMethod" value="In-Person Shelter Visit" onchange="toggleVisitDate()" class="mt-1 accent-sage-600" />
+              <div>
+                <div class="font-semibold text-sm text-earth-900">Schedule Shelter Visit</div>
+                <div class="text-xs text-earth-700 mt-0.5">Book meet-and-greet in Payompon.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div id="visit-box" class="hidden bg-roseaccent-50 border border-roseaccent-100 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Visit Date *</label>
+            <input type="date" id="apply-visit-date" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Time Slot *</label>
+            <select id="apply-visit-time" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-sm">
+              <option value="09:00 AM - 10:30 AM">09:00 AM - 10:30 AM</option>
+              <option value="01:30 PM - 03:00 PM">01:30 PM - 03:00 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Full Legal Name *</label>
+            <input type="text" id="apply-name" required placeholder="Maria Clara Santos" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Contact Number *</label>
+            <input type="tel" id="apply-phone" required placeholder="0917-555-0192" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Complete Address / Barangay *</label>
+          <input type="text" id="apply-address" required placeholder="Brgy. Payompon, Mamburao, Occ. Mindoro" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Living Situation *</label>
+            <select id="apply-living" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+              <option value="Owned House (Fenced Yard)">Owned House (Fenced Yard)</option>
+              <option value="Rented Home (Pet-Friendly)">Rented Home (Pet-Friendly)</option>
+              <option value="Apartment">Apartment</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Previous Pet Experience *</label>
+            <input type="text" id="apply-exp" required placeholder="Raised Aspins for 5 years" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1">Reason for Adoption *</label>
+          <textarea id="apply-reason" rows="2" required placeholder="Tell us why you want to adopt..." class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-cream-200">
+          <button type="button" onclick="closeModal('modal-apply')" class="px-4 py-2 rounded-xl bg-cream-100 text-earth-800 text-sm font-semibold">Cancel</button>
+          <button type="submit" class="px-6 py-2 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-earth-900 text-cream-100 mt-16 border-t border-earth-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-sage-600 text-white flex items-center justify-center">
+          <i data-lucide="paw-print" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <p class="font-display font-bold text-sm text-white">KALINGA: Stray Pet Adoption System</p>
+          <p class="text-xs text-cream-200">Brgy. Payompon, Mamburao, Occidental Mindoro</p>
+        </div>
+      </div>
+      <p class="text-xs text-cream-200 text-center sm:text-right">
+        Care, Protection, and Nurturing • Community Animal Welfare
+      </p>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT LOGIC                                                      -->
+  <!-- ===================================================================== -->
+  <script>
+    const STORAGE_KEYS = {
+      PETS: 'kalinga_app_pets_v1',
+      USERS: 'kalinga_app_users_v1',
+      CURRENT_USER: 'kalinga_app_current_user_v1',
+      APPLICATIONS: 'kalinga_app_applications_v1'
+    };
+
+    const DEFAULT_PETS = [
+      {
+        id: 'KLG-001',
+        name: 'Tala',
+        species: 'Dog',
+        breed: 'Aspin',
+        age: '1.5 Years',
+        sex: 'Female',
+        color: 'Golden Tan',
+        size: 'Medium',
+        weight: '13.5 kg',
+        dateRescued: '2026-08-14',
+        locationFound: 'Brgy. Payompon, Mamburao',
+        temperament: 'Affectionate, gentle with kids',
+        status: 'Available',
+        themeBg: '#E1ECE4',
+        themeAccent: '#3B6648',
+        medical: { vaccination: 'Anti-Rabies & 5-in-1 Complete', deworming: 'Completed', spayNeuter: 'Spayed', vetNotes: 'Cleared by municipal vet.' }
+      },
+      {
+        id: 'KLG-002',
+        name: 'Muning',
+        species: 'Cat',
+        breed: 'Puspin',
+        age: '8 Months',
+        sex: 'Male',
+        color: 'Orange Tabby',
+        size: 'Small',
+        weight: '3.6 kg',
+        dateRescued: '2026-09-02',
+        locationFound: 'Brgy. Balansay, Mamburao',
+        temperament: 'Playful, litter-trained',
+        status: 'Available',
+        themeBg: '#FAE6DF',
+        themeAccent: '#C25630',
+        medical: { vaccination: 'Anti-Rabies Complete', deworming: 'Completed', spayNeuter: 'Neutered', vetNotes: 'Healthy and active.' }
+      },
+      {
+        id: 'KLG-003',
+        name: 'Bantay',
+        species: 'Dog',
+        breed: 'Aspin Mix',
+        age: '2 Years',
+        sex: 'Male',
+        color: 'Brindle',
+        size: 'Large',
+        weight: '18.2 kg',
+        dateRescued: '2026-07-21',
+        locationFound: 'Brgy. Tayamaan, Mamburao',
+        temperament: 'Loyal, alert, friendly',
+        status: 'Available',
+        themeBg: '#EFE6D5',
+        themeAccent: '#4A3F35',
+        medical: { vaccination: 'Anti-Rabies Complete', deworming: 'Completed', spayNeuter: 'Neutered', vetNotes: 'Strong and active.' }
+      }
+    ];
+
+    let pets = [];
+    let users = [];
+    let currentUser = null;
+    let applications = [];
+
+    function initStorage() {
+      const p = localStorage.getItem(STORAGE_KEYS.PETS);
+      const u = localStorage.getItem(STORAGE_KEYS.USERS);
+      const cu = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+      const a = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+
+      pets = p ? JSON.parse(p) : DEFAULT_PETS;
+      users = u ? JSON.parse(u) : [{ name: 'Maria Santos', email: 'maria@example.com', password: 'password123' }];
+      currentUser = cu ? JSON.parse(cu) : null;
+      applications = a ? JSON.parse(a) : [
+        { refId: 'APP-2026-101', petId: 'KLG-001', petName: 'Tala', adopterName: 'Maria Santos', email: 'maria@example.com', date: '2026-11-10', method: 'Online Direct Application', status: 'Pending' }
+      ];
+      saveStorage();
+    }
+
+    function saveStorage() {
+      localStorage.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentUser));
+      localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(applications));
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = { success: 'bg-sage-700 text-white', warning: 'bg-terracotta-600 text-white' };
+      toast.className = `p-4 rounded-2xl shadow-lg text-sm font-medium transition-all ${colors[type] || colors.success}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    function switchView(viewName) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update Nav active states
+      ['home', 'about', 'gallery', 'contact', 'dashboard'].forEach(v => {
+        const btn = document.getElementById(`nav-${v}`);
+        if (btn) btn.className = v === viewName ? 'transition text-sage-700 font-bold pb-1 nav-link-active' : 'transition hover:text-sage-700 pb-1 text-earth-800';
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      refreshUI();
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // Auth Handlers
+    function handleRegisterSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+
+      if (users.some(u => u.email === email)) {
+        showToast('Email already registered! Please login.', 'warning');
+        return;
+      }
+
+      const newUser = { name, email, password };
+      users.push(newUser);
+      currentUser = newUser;
+      saveStorage();
+      refreshUI();
+      switchView('dashboard');
+      showToast(`Welcome to Kalinga, ${name}! Account created.`);
+    }
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) {
+        showToast('Invalid email or password.', 'warning');
+        return;
+      }
+
+      currentUser = user;
+      saveStorage();
+      refreshUI();
+      switchView('dashboard');
+      showToast(`Welcome back, ${user.name}!`);
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      saveStorage();
+      refreshUI();
+      switchView('home');
+      showToast('Logged out successfully.');
+    }
+
+    // SVG Illustration helper
+    function getPetSVG(pet) {
+      const isDog = pet.species === 'Dog';
+      const accent = pet.themeAccent || (isDog ? '#3B6648' : '#C25630');
+      if (isDog) {
+        return `<svg viewBox="0 0 120 120" class="w-28 h-28" fill="none"><circle cx="60" cy="60" r="54" fill="white" fill-opacity="0.7"/><rect x="34" y="34" width="52" height="54" rx="26" fill="white" stroke="${accent}" stroke-width="3.5"/><circle cx="48" cy="56" r="4" fill="#1F1A16"/><circle cx="72" cy="56" r="4" fill="#1F1A16"/><ellipse cx="60" cy="68" rx="13" ry="10" fill="#F7F3EB"/><path d="M55 65C55 63 65 63 65 65C65 68 61.5 70 60 70C58.5 70 55 68 55 65Z" fill="#1F1A16"/></svg>`;
+      } else {
+        return `<svg viewBox="0 0 120 120" class="w-28 h-28" fill="none"><circle cx="60" cy="60" r="54" fill="white" fill-opacity="0.7"/><path d="M35 48L31 24L52 38" fill="${accent}"/><path d="M85 48L89 24L68 38" fill="${accent}"/><rect x="32" y="36" width="56" height="50" rx="25" fill="white" stroke="${accent}" stroke-width="3.5"/><ellipse cx="47" cy="57" rx="3.8" ry="4.5" fill="#1F1A16"/><ellipse cx="73" cy="57" rx="3.8" ry="4.5" fill="#1F1A16"/><path d="M57 65H63L60 68.5L57 65Z" fill="#D96B43"/></svg>`;
+      }
+    }
+
+    // Render Pets in Gallery & Home
+    function renderGalleryPets() {
+      const search = document.getElementById('gallery-search')?.value.toLowerCase().trim() || '';
+      const species = document.getElementById('gallery-species')?.value || 'All';
+      const size = document.getElementById('gallery-size')?.value || 'All';
+      const status = document.getElementById('gallery-status')?.value || 'All';
+
+      const filtered = pets.filter(p => {
+        const matchSearch = !search || p.name.toLowerCase().includes(search) || p.breed.toLowerCase().includes(search) || p.locationFound.toLowerCase().includes(search);
+        const matchSpecies = species === 'All' || p.species === species;
+        const matchSize = size === 'All' || p.size === size;
+        const matchStatus = status === 'All' || p.status === status;
+        return matchSearch && matchSpecies && matchSize && matchStatus;
+      });
+
+      const grid = document.getElementById('gallery-pet-grid');
+      if (!grid) return;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-12 text-center bg-white rounded-3xl border border-cream-200"><p class="text-sm text-earth-700">No pets found matching your filter.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(pet => `
+        <div class="bg-white rounded-3xl border border-cream-200 shadow-sm overflow-hidden flex flex-col">
+          <div class="relative p-6 flex items-center justify-center" style="background-color: ${pet.themeBg || '#E1ECE4'}">
+            <span class="absolute top-3 left-3 text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-white/90 text-earth-800">${pet.id}</span>
+            <span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-sage-100 text-sage-800">${pet.status}</span>
+            ${getPetSVG(pet)}
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <h3 class="font-display font-bold text-xl text-earth-900">${pet.name}</h3>
+              <p class="text-xs text-earth-700">${pet.breed} • ${pet.sex} • ${pet.age}</p>
+              <p class="text-xs text-earth-800 mt-2 bg-cream-50 p-2.5 rounded-xl border border-cream-200">"${pet.temperament}"</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-cream-200">
+              <button onclick="openPetDetail('${pet.id}')" class="px-3 py-2 rounded-xl bg-cream-100 text-earth-900 text-xs font-semibold">Full Profile</button>
+              <button onclick="openApplyModal('${pet.id}')" class="px-3 py-2 rounded-xl bg-sage-600 text-white text-xs font-semibold">Adopt / Visit</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderHomeFeatured() {
+      const grid = document.getElementById('home-featured-grid');
+      if (!grid) return;
+      const featured = pets.filter(p => p.status === 'Available').slice(0, 3);
+      grid.innerHTML = featured.map(pet => `
+        <div class="bg-white rounded-3xl border border-cream-200 shadow-sm overflow-hidden flex flex-col">
+          <div class="relative p-6 flex items-center justify-center" style="background-color: ${pet.themeBg || '#E1ECE4'}">
+            <span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-sage-100 text-sage-800">${pet.status}</span>
+            ${getPetSVG(pet)}
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <h3 class="font-display font-bold text-xl text-earth-900">${pet.name}</h3>
+              <p class="text-xs text-earth-700">${pet.breed} • ${pet.sex} • ${pet.age}</p>
+              <p class="text-xs text-earth-800 mt-2 bg-cream-50 p-2.5 rounded-xl border border-cream-200">"${pet.temperament}"</p>
+            </div>
+            <button onclick="openPetDetail('${pet.id}')" class="w-full py-2.5 rounded-xl bg-sage-600 text-white text-xs font-semibold">View Profile & Apply</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openPetDetail(petId) {
+      const pet = pets.find(p => p.id === petId);
+      if (!pet) return;
+      document.getElementById('detail-pet-id').textContent = pet.id;
+      document.getElementById('detail-pet-status').textContent = pet.status;
+      document.getElementById('detail-pet-content').innerHTML = `
+        <div class="flex items-center gap-4 p-4 rounded-2xl" style="background-color: ${pet.themeBg}">
+          ${getPetSVG(pet)}
+          <div>
+            <h2 class="font-display font-extrabold text-2xl text-earth-900">${pet.name}</h2>
+            <p class="text-xs text-earth-700">${pet.species} • ${pet.breed} • ${pet.age}</p>
+            <p class="text-xs font-semibold text-sage-800 mt-1">Rescued in: ${pet.locationFound}</p>
+          </div>
+        </div>
+        <div class="space-y-3 text-sm">
+          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+            <strong>Medical & Care:</strong><br/>
+            Vaccination: ${pet.medical.vaccination}<br/>
+            Deworming: ${pet.medical.deworming}<br/>
+            Spay/Neuter: ${pet.medical.spayNeuter}<br/>
+            Vet Notes: ${pet.medical.vetNotes}
+          </div>
+          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+            <strong>Temperament:</strong> ${pet.temperament}
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-3 border-t border-cream-200">
+          <button onclick="closeModal('modal-pet-detail')" class="px-4 py-2 rounded-xl bg-cream-100 text-xs font-semibold">Close</button>
+          <button onclick="closeModal('modal-pet-detail'); openApplyModal('${pet.id}')" class="px-5 py-2 rounded-xl bg-sage-600 text-white text-xs font-semibold">Adopt / Visit</button>
+        </div>
+      `;
+      openModal('modal-pet-detail');
+    }
+
+    function openApplyModal(petId) {
+      if (!currentUser) {
+        showToast('Please login or register first to submit an adoption application.', 'warning');
+        switchView('login');
+        return;
+      }
+      const pet = pets.find(p => p.id === petId);
+      if (!pet) return;
+      document.getElementById('adoption-form').reset();
+      document.getElementById('apply-pet-id').value = pet.id;
+      document.getElementById('apply-pet-subtitle').textContent = `Applying for: ${pet.name} (${pet.id})`;
+      document.getElementById('apply-name').value = currentUser.name;
+      document.getElementById('apply-email').value = currentUser.email;
+      openModal('modal-apply');
+    }
+
+    function toggleVisitDate() {
+      const method = document.querySelector('input[name="adoptionMethod"]:checked').value;
+      const box = document.getElementById('visit-box');
+      if (method === 'In-Person Shelter Visit') box.classList.remove('hidden');
+      else box.classList.add('hidden');
+    }
+
+    function handleAdoptionSubmit(event) {
+      event.preventDefault();
+      const petId = document.getElementById('apply-pet-id').value;
+      const pet = pets.find(p => p.id === petId);
+      const method = document.querySelector('input[name="adoptionMethod"]:checked').value;
+
+      const newApp = {
+        refId: `APP-2026-${100 + applications.length + 1}`,
+        petId,
+        petName: pet.name,
+        adopterName: document.getElementById('apply-name').value,
+        email: currentUser.email,
+        date: new Date().toISOString().split('T')[0],
+        method,
+        status: 'Pending'
+      };
+
+      applications.unshift(newApp);
+      saveStorage();
+      closeModal('modal-apply');
+      refreshUI();
+      switchView('dashboard');
+      showToast(`Application ${newApp.refId} submitted successfully!`);
+    }
+
+    function renderDashboard() {
+      const container = document.getElementById('dashboard-applications-list');
+      if (!container) return;
+
+      if (!currentUser) {
+        container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl border border-cream-200"><p class="text-sm text-earth-700">Please log in to view your applications.</p></div>`;
+        return;
+      }
+
+      const userApps = applications.filter(a => a.email === currentUser.email);
+      if (userApps.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl border border-cream-200"><p class="text-sm text-earth-700">You have no submitted adoption applications yet.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = userApps.map(app => `
+        <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded bg-earth-800 text-white">${app.refId}</span>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sage-100 text-sage-800">${app.status}</span>
+            </div>
+            <h3 class="font-display font-bold text-lg text-earth-900 mt-2">Pet: ${app.petName} (${app.petId})</h3>
+            <p class="text-xs text-earth-700">Method: ${app.method} • Submitted: ${app.date}</p>
+          </div>
+          <button onclick="showToast('Reference ID: ${app.refId} is currently under staff review.')" class="px-4 py-2 rounded-xl bg-cream-100 hover:bg-cream-200 text-earth-800 text-xs font-semibold">View Status Details</button>
+        </div>
+      `).join('');
+    }
+
+    function handleContactSubmit(event) {
+      event.preventDefault();
+      event.target.reset();
+      showToast('Thank you! Your message has been sent to Kalinga shelter staff.');
+    }
+
+    function refreshUI() {
+      // Stats
+      const avail = pets.filter(p => p.status === 'Available').length;
+      const adopted = pets.filter(p => p.status === 'Adopted').length;
+      if (document.getElementById('stat-available')) document.getElementById('stat-available').textContent = avail;
+      if (document.getElementById('stat-rescued')) document.getElementById('stat-rescued').textContent = pets.length;
+      if (document.getElementById('stat-adopted')) document.getElementById('stat-adopted').textContent = adopted;
+
+      // Auth controls
+      const guestCtrl = document.getElementById('auth-guest-controls');
+      const userCtrl = document.getElementById('auth-user-controls');
+      const dashNav = document.getElementById('nav-dashboard');
+      const mobileDashNav = document.getElementById('mobile-nav-dashboard');
+
+      if (currentUser) {
+        guestCtrl.classList.add('hidden');
+        userCtrl.classList.remove('hidden');
+        if (dashNav) dashNav.classList.remove('hidden');
+        if (mobileDashNav) mobileDashNav.classList.remove('hidden');
+        document.getElementById('user-display-name').textContent = currentUser.name;
+        document.getElementById('user-initials').textContent = currentUser.name.charAt(0).toUpperCase();
+      } else {
+        guestCtrl.classList.remove('hidden');
+        userCtrl.classList.add('hidden');
+        if (dashNav) dashNav.classList.add('hidden');
+        if (mobileDashNav) mobileDashNav.classList.add('hidden');
+      }
+
+      renderHomeFeatured();
+      renderGalleryPets();
+      renderDashboard();
+      lucide.createIcons();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initStorage();
+      refreshUI();
+    });
+  </script>
+</body>
+</html>

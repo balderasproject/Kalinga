@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalinga: Stray Pet Adoption System | Mamburao & Occidental Mindoro</title>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            cream: {
+              50: '#FDFBF7',
+              100: '#F7F3EB',
+              200: '#EFE6D5',
+            },
+            sage: {
+              50: '#F2F6F3',
+              100: '#E1ECE4',
+              200: '#C4D9CA',
+              500: '#4A7C59',
+              600: '#3B6648',
+              700: '#2E5038',
+              800: '#243E2C',
+            },
+            terracotta: {
+              50: '#FDF4F1',
+              100: '#FAE6DF',
+              500: '#D96B43',
+              600: '#C25630',
+              700: '#9E4323',
+            },
+            earth: {
+              700: '#4A3F35',
+              800: '#332B24',
+              900: '#1F1A16',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Smooth custom scrollbar & print adjustments */
+    body {
+      background-color: #FDFBF7;
+      color: #332B24;
+    }
+    .tab-active {
+      border-bottom: 3px solid #4A7C59;
+      color: #2E5038;
+      font-weight: 600;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-area, #printable-area * {
+        visibility: visible;
+      }
+      #printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        padding: 20px !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-sage-200 selection:text-earth-900">
+
+  <!-- Toast / Message Box Container (Replaces alert) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-cream-50/95 backdrop-blur-md border-b border-cream-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchPortal('public')">
+          <div class="w-10 h-10 rounded-xl bg-sage-600 text-white flex items-center justify-center shadow-sm">
+            <i data-lucide="paw-print" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-extrabold text-xl tracking-tight text-earth-900">KALINGA</span>
+              <span class="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-terracotta-100 text-terracotta-700">Mamburao</span>
+            </div>
+            <p class="text-xs text-earth-700 hidden sm:block">Stray Pet Adoption & Welfare System • Occidental Mindoro</p>
+          </div>
+        </div>
+
+        <!-- Portal Switcher & Quick Tracker Button -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button onclick="openTrackerModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-cream-100 hover:bg-cream-200 text-earth-800 border border-cream-200 transition">
+            <i data-lucide="search-check" class="w-4 h-4 text-terracotta-600"></i>
+            <span>Track Application</span>
+          </button>
+
+          <div class="bg-cream-100 p-1 rounded-xl border border-cream-200 flex items-center" role="tablist">
+            <button id="btn-mode-public" onclick="switchPortal('public')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-sage-600 text-white shadow-sm">
+              <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+              <span>Public Adopter</span>
+            </button>
+            <button id="btn-mode-admin" onclick="switchPortal('admin')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-earth-700 hover:text-earth-900">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Shelter Staff</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: PUBLIC ADOPTER PORTAL                                         -->
+  <!-- ===================================================================== -->
+  <main id="view-public" class="flex-1">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-sage-50 via-cream-50 to-terracotta-50 border-b border-cream-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-100 text-sage-800 text-xs font-semibold">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-sage-600"></i>
+              <span>Serving Mamburao & Nearby Towns in Occidental Mindoro</span>
+            </div>
+            <h1 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-earth-900 leading-tight">
+              Care, Protection, and Nurturing for Every Stray Friend.
+            </h1>
+            <p class="text-base sm:text-lg text-earth-700 leading-relaxed max-w-2xl">
+              <strong>Kalinga</strong> connects rescued stray dogs and cats across Mamburao with compassionate forever families. Browse verified medical & temperament profiles online, submit an adoption application, or schedule an in-person shelter visit.
+            </p>
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <a href="#pet-catalog" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
+                <i data-lucide="paw-print" class="w-4 h-4"></i>
+                <span>Meet Available Pets</span>
+              </a>
+              <button onclick="openTrackerModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white hover:bg-cream-100 text-earth-800 font-semibold text-sm border border-cream-200 shadow-sm transition">
+                <i data-lucide="clipboard-check" class="w-4 h-4 text-terracotta-600"></i>
+                <span>Check Status & Post-Adoption</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Community Impact Stats Card -->
+          <div class="lg:col-span-5">
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-6 border border-cream-200 shadow-md space-y-5">
+              <div class="flex items-center justify-between border-b border-cream-200 pb-3">
+                <div>
+                  <h2 class="font-display font-bold text-base text-earth-900">Mamburao Rescue & Adoption Impact</h2>
+                  <p class="text-xs text-earth-700">Live synchronized shelter registry</p>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-sage-500 animate-pulse" title="Live Database"></span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-3.5 rounded-xl bg-sage-50 border border-sage-100">
+                  <div id="hero-stat-available" class="font-display font-extrabold text-2xl sm:text-3xl text-sage-700">0</div>
+                  <div class="text-xs font-medium text-earth-700 mt-1">Available Pets</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-cream-100 border border-cream-200">
+                  <div id="hero-stat-rescued" class="font-display font-extrabold text-2xl sm:text-3xl text-earth-900">0</div>
+                  <div class="text-xs font-medium text-earth-700 mt-1">Total Rescued</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-terracotta-50 border border-terracotta-100">
+                  <div id="hero-stat-adopted" class="font-display font-extrabold text-2xl sm:text-3xl text-terracotta-600">0</div>
+                  <div class="text-xs font-medium text-earth-700 mt-1">Forever Homes</div>
+                </div>
+              </div>
+
+              <div class="bg-cream-50 rounded-xl p-3.5 border border-cream-200 flex items-start gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-sage-600 shrink-0 mt-0.5"></i>
+                <p class="text-xs text-earth-700 leading-relaxed">
+                  <strong>How Kalinga Works:</strong> Select a pet to view full health & vaccination records, apply online or book a shelter visit in Brgy. Payompon, and track your application using your Reference ID.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pet Catalog & Search/Filter Section -->
+    <section id="pet-catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="font-display font-bold text-2xl sm:text-3xl text-earth-900">Rescued Pets Directory</h2>
+          <p class="text-sm text-earth-700 mt-1">Browse dogs and cats rescued across barangays in Mamburao & Occidental Mindoro.</p>
+        </div>
+        <button onclick="resetPublicFilters()" class="self-start md:self-auto text-xs font-semibold text-sage-700 hover:text-sage-800 underline">
+          Reset Filters
+        </button>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="bg-white p-4 rounded-2xl border border-cream-200 shadow-sm mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Search Input -->
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-earth-700 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="filter-search" oninput="renderPublicPets()" placeholder="Search name, breed, barangay..." class="w-full pl-10 pr-3 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+          </div>
+
+          <!-- Species Filter -->
+          <div>
+            <select id="filter-species" onchange="renderPublicPets()" class="w-full px-3.5 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500">
+              <option value="All">All Species (Dogs & Cats)</option>
+              <option value="Dog">Dogs Only</option>
+              <option value="Cat">Cats Only</option>
+            </select>
+          </div>
+
+          <!-- Size Filter -->
+          <div>
+            <select id="filter-size" onchange="renderPublicPets()" class="w-full px-3.5 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500">
+              <option value="All">All Sizes</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
+
+          <!-- Availability Status Filter -->
+          <div>
+            <select id="filter-status" onchange="renderPublicPets()" class="w-full px-3.5 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500">
+              <option value="All">All Statuses</option>
+              <option value="Available" selected>Available for Adoption</option>
+              <option value="Fostered">In Foster Care</option>
+              <option value="Medical Care">Under Medical Care</option>
+              <option value="Adopted">Already Adopted</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pet Cards Grid -->
+      <div id="public-pet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: SHELTER STAFF & ADMIN DASHBOARD                               -->
+  <!-- ===================================================================== -->
+  <main id="view-admin" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-md bg-sage-100 text-sage-800 text-xs font-bold uppercase tracking-wider">Shelter Operations</span>
+          <span class="text-xs text-earth-700">Mamburao Central Rescue Hub</span>
+        </div>
+        <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-earth-900 mt-1">Kalinga Administrative Dashboard</h1>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openAddPetModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold shadow-sm transition">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Register Rescued Pet</span>
+        </button>
+        <button onclick="resetDemoData()" class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-cream-100 hover:bg-cream-200 text-earth-800 text-xs font-semibold border border-cream-200 transition" title="Restore initial Mamburao sample records">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          <span>Reset Demo Data</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Cards & Visual Breakdown -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white p-5 rounded-2xl border border-cream-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-earth-700">Total Animals</p>
+          <p id="kpi-total-pets" class="font-display font-extrabold text-3xl text-earth-900 mt-1">0</p>
+          <p class="text-xs text-earth-700 mt-1" id="kpi-species-split">0 Dogs • 0 Cats</p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-cream-100 text-earth-800 flex items-center justify-center">
+          <i data-lucide="paw-print" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-cream-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-sage-700">Available for Adoption</p>
+          <p id="kpi-available-pets" class="font-display font-extrabold text-3xl text-sage-700 mt-1">0</p>
+          <p class="text-xs text-earth-700 mt-1">Ready for rehoming</p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-sage-50 text-sage-600 flex items-center justify-center">
+          <i data-lucide="heart" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-cream-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-700">Pending Applications</p>
+          <p id="kpi-pending-apps" class="font-display font-extrabold text-3xl text-amber-600 mt-1">0</p>
+          <p class="text-xs text-earth-700 mt-1">Awaiting staff screening</p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+          <i data-lucide="file-clock" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-cream-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-terracotta-700">Completed Adoptions</p>
+          <p id="kpi-completed-adoptions" class="font-display font-extrabold text-3xl text-terracotta-600 mt-1">0</p>
+          <p class="text-xs text-earth-700 mt-1" id="kpi-followup-count">0 Welfare checks logged</p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-terracotta-50 text-terracotta-600 flex items-center justify-center">
+          <i data-lucide="home" class="w-6 h-6"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Status Breakdown Bar -->
+    <div class="bg-white p-5 rounded-2xl border border-cream-200 shadow-sm mb-8">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="font-display font-bold text-sm text-earth-900">Shelter Population & Care Status Distribution</h2>
+        <div class="flex flex-wrap items-center gap-4 text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sage-500"></span>Available</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>Fostered</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>Medical Care</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-terracotta-500"></span>Adopted</span>
+        </div>
+      </div>
+      <div id="status-chart-bar" class="w-full h-4 rounded-full bg-cream-100 overflow-hidden flex"></div>
+    </div>
+
+    <!-- Admin Navigation Tabs -->
+    <div class="border-b border-cream-200 mb-6 flex overflow-x-auto gap-6">
+      <button onclick="switchAdminTab('pets')" id="tab-btn-pets" class="pb-3 text-sm whitespace-nowrap tab-active flex items-center gap-2">
+        <i data-lucide="database" class="w-4 h-4"></i>
+        <span>Pet Records Management</span>
+      </button>
+      <button onclick="switchAdminTab('applications')" id="tab-btn-applications" class="pb-3 text-sm whitespace-nowrap text-earth-700 hover:text-earth-900 flex items-center gap-2">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+        <span>Adoption Applications & Screening</span>
+        <span id="badge-pending-count" class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800 font-bold">0</span>
+      </button>
+      <button onclick="switchAdminTab('postadoption')" id="tab-btn-postadoption" class="pb-3 text-sm whitespace-nowrap text-earth-700 hover:text-earth-900 flex items-center gap-2">
+        <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+        <span>Post-Adoption Monitoring</span>
+      </button>
+      <button onclick="switchAdminTab('reports')" id="tab-btn-reports" class="pb-3 text-sm whitespace-nowrap text-earth-700 hover:text-earth-900 flex items-center gap-2">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+        <span>Shelter Reports</span>
+      </button>
+    </div>
+
+    <!-- TAB A: Pet Records Management -->
+    <div id="admin-tab-pets" class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-cream-200">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 text-earth-700 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="admin-pet-search" oninput="renderAdminPetsTable()" placeholder="Search by ID, Name, Barangay, or Breed..." class="w-full pl-10 pr-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
+        </div>
+        <select id="admin-pet-status-filter" onchange="renderAdminPetsTable()" class="px-3.5 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+          <option value="All">All Pet Statuses</option>
+          <option value="Available">Available</option>
+          <option value="Fostered">Fostered</option>
+          <option value="Medical Care">Medical Care</option>
+          <option value="Adopted">Adopted</option>
+        </select>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-cream-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-cream-100/80 border-b border-cream-200 text-xs font-bold uppercase tracking-wider text-earth-700">
+                <th class="py-3.5 px-4">Pet ID & Profile</th>
+                <th class="py-3.5 px-4">Rescue Details</th>
+                <th class="py-3.5 px-4">Medical & Care</th>
+                <th class="py-3.5 px-4">Current Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-pets-tbody" class="divide-y divide-cream-200 text-sm">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB B: Adoption Applications & Screening -->
+    <div id="admin-tab-applications" class="hidden space-y-4">
+      <div class="bg-white p-4 rounded-2xl border border-cream-200 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm text-earth-700">Review adopter suitability, add screening remarks, and update status. Marking an application as <strong>Completed</strong> automatically updates the pet's status to <strong>Adopted</strong>.</p>
+        <select id="admin-app-filter" onchange="renderAdminApplications()" class="px-3.5 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+          <option value="All">All Applications</option>
+          <option value="Pending">Pending Review</option>
+          <option value="Approved">Approved (For Release/Visit)</option>
+          <option value="Completed">Completed Adoptions</option>
+          <option value="Rejected">Declined / Rejected</option>
+        </select>
+      </div>
+
+      <div id="admin-applications-list" class="grid grid-cols-1 gap-4">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+    <!-- TAB C: Post-Adoption Monitoring -->
+    <div id="admin-tab-postadoption" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Log New Welfare Check Form -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-cream-200 shadow-sm h-fit">
+          <h3 class="font-display font-bold text-lg text-earth-900 mb-1">Log Post-Adoption Follow-Up</h3>
+          <p class="text-xs text-earth-700 mb-4">Record welfare checks and adopter feedback for adopted pets.</p>
+          <form onsubmit="handleAdminPostAdoptionSubmit(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Select Adopted Pet / Application *</label>
+              <select id="pa-pet-select" required class="w-full px-3 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Follow-Up Date *</label>
+              <input type="date" id="pa-date" required class="w-full px-3 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Pet's Adjustment Status *</label>
+              <select id="pa-adjustment" required class="w-full px-3 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+                <option value="Thriving & Well-Adjusted">Thriving & Well-Adjusted</option>
+                <option value="Gradually Adjusting">Gradually Adjusting (Normal)</option>
+                <option value="Needs Behavioral/Vet Guidance">Needs Behavioral/Vet Guidance</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Adopter Feedback & Home Update *</label>
+              <textarea id="pa-feedback" rows="3" required placeholder="Describe appetite, environment, bonding with family..." class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Concerns or Assistance Needed</label>
+              <input type="text" id="pa-concerns" placeholder="None, or specify vaccine reminder / vet advice..." class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
+              Save Welfare Follow-Up Record
+            </button>
+          </form>
+        </div>
+
+        <!-- Welfare Logs List -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-lg text-earth-900">Post-Adoption Welfare Logs</h3>
+            <span id="pa-total-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-sage-100 text-sage-800">0 Records</span>
+          </div>
+          <div id="admin-postadoption-list" class="space-y-3">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB D: Shelter Reports -->
+    <div id="admin-tab-reports" class="hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-cream-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="text-sm font-semibold text-earth-800">Report Type:</label>
+          <select id="report-type-select" onchange="renderReportPreview()" class="px-4 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm font-medium">
+            <option value="adoption-summary">Adoption Summary & Application Report</option>
+            <option value="animal-intake">Animal Intake & Medical Registry Report</option>
+            <option value="post-adoption">Post-Adoption Welfare Monitoring Report</option>
+          </select>
+        </div>
+        <button onclick="printSection('report-printable-box')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-terracotta-600 hover:bg-terracotta-700 text-white text-sm font-semibold shadow-sm transition">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / Export Report (PDF)</span>
+        </button>
+      </div>
+
+      <div id="report-printable-box" class="bg-white p-6 sm:p-8 rounded-2xl border border-cream-200 shadow-sm">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: PET FULL PROFILE & MEDICAL DETAILS                           -->
+  <!-- ===================================================================== -->
+  <div id="modal-pet-detail" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-cream-50 border-b border-cream-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span id="detail-pet-id" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-earth-800 text-white">KLG-001</span>
+          <span id="detail-pet-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full">Available</span>
+        </div>
+        <button onclick="closeModal('modal-pet-detail')" class="p-2 rounded-xl hover:bg-cream-200 text-earth-700 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div id="detail-pet-content" class="p-6 overflow-y-auto space-y-6">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: ONLINE ADOPTION / SHELTER VISIT APPLICATION FORM             -->
+  <!-- ===================================================================== -->
+  <div id="modal-apply" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
+      <div class="px-6 py-4 bg-sage-700 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-lg">Kalinga Adoption & Visit Application</h3>
+          <p id="apply-pet-subtitle" class="text-xs text-sage-100">Applying for: Pet Name</p>
+        </div>
+        <button onclick="closeModal('modal-apply')" class="p-2 rounded-xl hover:bg-sage-600 text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="adoption-form" onsubmit="handleAdoptionSubmit(event)" class="p-6 overflow-y-auto space-y-5">
+        <input type="hidden" id="apply-pet-id" />
+
+        <!-- Step 1: Choose Method -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-earth-700 mb-2">1. Select Engagement Method *</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="cursor-pointer border-2 rounded-2xl p-3.5 flex items-start gap-3 transition has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 border-cream-200">
+              <input type="radio" name="adoptionMethod" value="Online Direct Application" checked onchange="toggleVisitDateField()" class="mt-1 accent-sage-600" />
+              <div>
+                <div class="font-semibold text-sm text-earth-900">Online Direct Application</div>
+                <div class="text-xs text-earth-700 mt-0.5">Complete screening remotely; ideal for distant barangays or towns.</div>
+              </div>
+            </label>
+            <label class="cursor-pointer border-2 rounded-2xl p-3.5 flex items-start gap-3 transition has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 border-cream-200">
+              <input type="radio" name="adoptionMethod" value="In-Person Shelter Visit" onchange="toggleVisitDateField()" class="mt-1 accent-sage-600" />
+              <div>
+                <div class="font-semibold text-sm text-earth-900">Schedule Shelter Visit</div>
+                <div class="text-xs text-earth-700 mt-0.5">Book a meet-and-greet appointment at Mamburao Shelter.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Conditional Scheduled Visit Date & Time -->
+        <div id="visit-schedule-box" class="hidden bg-terracotta-50 border border-terracotta-100 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Preferred Visit Date *</label>
+            <input type="date" id="apply-visit-date" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Preferred Time Slot *</label>
+            <select id="apply-visit-time" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-sm">
+              <option value="09:00 AM - 10:30 AM">09:00 AM - 10:30 AM</option>
+              <option value="10:30 AM - 12:00 PM">10:30 AM - 12:00 PM</option>
+              <option value="01:30 PM - 03:00 PM">01:30 PM - 03:00 PM</option>
+              <option value="03:00 PM - 04:30 PM">03:00 PM - 04:30 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Step 2: Adopter Personal & Contact Details -->
+        <div class="space-y-3">
+          <label class="block text-xs font-bold uppercase tracking-wider text-earth-700">2. Adopter Information</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Full Legal Name *</label>
+              <input type="text" id="apply-name" required placeholder="e.g., Maria Clara Santos" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Active Contact Number *</label>
+              <input type="tel" id="apply-phone" required placeholder="e.g., 0917-555-0192" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
+              <input type="email" id="apply-email" required placeholder="maria@example.com" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Complete Address / Barangay *</label>
+              <input type="text" id="apply-address" required placeholder="Brgy. Payompon, Mamburao, Occ. Mindoro" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Household & Suitability Assessment -->
+        <div class="space-y-3">
+          <label class="block text-xs font-bold uppercase tracking-wider text-earth-700">3. Household & Pet Care Suitability</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Living Situation *</label>
+              <select id="apply-living" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+                <option value="Owned House (Fenced Yard)">Owned House (Fenced Yard)</option>
+                <option value="Owned House (Unfenced)">Owned House (Unfenced)</option>
+                <option value="Rented Home (Pet-Friendly)">Rented Home (Pet-Friendly)</option>
+                <option value="Apartment / Boarding House">Apartment / Boarding House</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Household Composition *</label>
+              <select id="apply-household" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+                <option value="Adults Only">Adults Only</option>
+                <option value="Family with Older Kids">Family with Older Kids</option>
+                <option value="Family with Toddlers">Family with Toddlers</option>
+                <option value="Living Alone">Living Alone</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Other Pets at Home *</label>
+              <select id="apply-other-pets" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+                <option value="None">No Other Pets</option>
+                <option value="Vaccinated Dog(s)">Vaccinated Dog(s)</option>
+                <option value="Vaccinated Cat(s)">Vaccinated Cat(s)</option>
+                <option value="Both Dogs & Cats">Both Dogs & Cats</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Previous Pet Experience *</label>
+              <input type="text" id="apply-experience" required placeholder="e.g., Raised 2 Aspins for 6 years" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Emergency Contact (Name & Phone) *</label>
+              <input type="text" id="apply-emergency" required placeholder="Juan Santos - 0918-444-3321" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Reason for Adoption & Care Plan *</label>
+            <textarea id="apply-reason" rows="2" required placeholder="Tell us why you want to adopt this pet and how you plan to care for them..." class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm"></textarea>
+          </div>
+        </div>
+
+        <!-- Agreement -->
+        <label class="flex items-start gap-2.5 p-3 rounded-xl bg-cream-50 border border-cream-200 cursor-pointer">
+          <input type="checkbox" id="apply-agree" required class="mt-0.5 accent-sage-600" />
+          <span class="text-xs text-earth-700 leading-relaxed">
+            I commit to providing lifetime care, proper nutrition, veterinary attention, and safe shelter, and I agree to Kalinga's post-adoption welfare follow-ups in Occidental Mindoro.
+          </span>
+        </label>
+
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-cream-200">
+          <button type="button" onclick="closeModal('modal-apply')" class="px-4 py-2.5 rounded-xl bg-cream-100 hover:bg-cream-200 text-earth-800 text-sm font-semibold">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold shadow-sm">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: APPLICATION CONFIRMATION & APPOINTMENT SLIP                  -->
+  <!-- ===================================================================== -->
+  <div id="modal-slip" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto">
+      <div id="slip-printable-content" class="p-6 sm:p-8 space-y-5">
+        <!-- Populated dynamically -->
+      </div>
+      <div class="px-6 py-4 bg-cream-50 border-t border-cream-200 flex flex-wrap items-center justify-between gap-3 no-print">
+        <button onclick="printSection('slip-printable-content')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-earth-800 hover:bg-earth-900 text-white text-xs font-semibold">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / Save Slip</span>
+        </button>
+        <button onclick="closeModal('modal-slip')" class="px-5 py-2 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: APPLICATION STATUS TRACKER & POST-ADOPTION PORTAL            -->
+  <!-- ===================================================================== -->
+  <div id="modal-tracker" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
+      <div class="px-6 py-4 bg-cream-50 border-b border-cream-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="search-check" class="w-5 h-5 text-terracotta-600"></i>
+          <h3 class="font-display font-bold text-lg text-earth-900">Application Tracker & Post-Adoption Check-In</h3>
+        </div>
+        <button onclick="closeModal('modal-tracker')" class="p-2 rounded-xl hover:bg-cream-200 text-earth-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-5">
+        <div>
+          <label class="block text-xs font-semibold text-earth-800 mb-1.5">Enter Your Application Reference ID</label>
+          <div class="flex gap-2">
+            <input type="text" id="tracker-ref-input" placeholder="e.g., APP-2026-101" class="flex-1 px-4 py-2.5 rounded-xl bg-cream-50 border border-cream-200 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-sage-500" />
+            <button onclick="lookupApplicationStatus()" class="px-5 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold">
+              Track
+            </button>
+          </div>
+          <!-- Quick sample ID chips for easy testing -->
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            <span class="text-xs text-earth-700">Sample IDs:</span>
+            <button type="button" onclick="quickFillTracker('APP-2026-101')" class="text-xs font-mono px-2 py-0.5 rounded-md bg-cream-100 hover:bg-cream-200 text-earth-800 border border-cream-200">APP-2026-101 (Pending)</button>
+            <button type="button" onclick="quickFillTracker('APP-2026-102')" class="text-xs font-mono px-2 py-0.5 rounded-md bg-cream-100 hover:bg-cream-200 text-earth-800 border border-cream-200">APP-2026-102 (Approved)</button>
+            <button type="button" onclick="quickFillTracker('APP-2026-103')" class="text-xs font-mono px-2 py-0.5 rounded-md bg-cream-100 hover:bg-cream-200 text-earth-800 border border-cream-200">APP-2026-103 (Completed)</button>
+          </div>
+        </div>
+
+        <div id="tracker-result-container" class="border-t border-cream-200 pt-4">
+          <p class="text-sm text-earth-700 text-center py-6">Enter your Reference ID above to view real-time screening updates, appointment details, or submit post-adoption wellness updates.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 5: ADD / REGISTER RESCUED PET (ADMIN)                           -->
+  <!-- ===================================================================== -->
+  <div id="modal-add-pet" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
+      <div class="px-6 py-4 bg-sage-700 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-lg">Register Rescued Animal</h3>
+          <p class="text-xs text-sage-100">Add complete profile & medical records to Kalinga database</p>
+        </div>
+        <button onclick="closeModal('modal-add-pet')" class="p-2 rounded-xl hover:bg-sage-600 text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAddPetSubmit(event)" class="p-6 overflow-y-auto space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Pet Name *</label>
+            <input type="text" id="new-pet-name" required placeholder="e.g., Bantay" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Species *</label>
+            <select id="new-pet-species" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+              <option value="Dog">Dog</option>
+              <option value="Cat">Cat</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Breed *</label>
+            <input type="text" id="new-pet-breed" required placeholder="e.g., Aspin / Puspin" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Estimated Age *</label>
+            <input type="text" id="new-pet-age" required placeholder="e.g., 1.5 Years" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Sex *</label>
+            <select id="new-pet-sex" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Size *</label>
+            <select id="new-pet-size" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Weight *</label>
+            <input type="text" id="new-pet-weight" required placeholder="e.g., 12 kg" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Color / Markings *</label>
+            <input type="text" id="new-pet-color" required placeholder="e.g., Tan with white paws" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Date Rescued *</label>
+            <input type="date" id="new-pet-date" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Location Found *</label>
+            <input type="text" id="new-pet-location" required placeholder="e.g., Brgy. Payompon, Mamburao" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Temperament *</label>
+            <input type="text" id="new-pet-temperament" required placeholder="e.g., Gentle, playful, good with kids" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-earth-800 mb-1">Initial Availability Status *</label>
+            <select id="new-pet-status" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+              <option value="Available">Available</option>
+              <option value="Medical Care">Medical Care</option>
+              <option value="Fostered">Fostered</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Medical & Care Section -->
+        <div class="border-t border-cream-200 pt-3 space-y-3">
+          <p class="text-xs font-bold uppercase tracking-wider text-sage-700">Medical & Veterinary Care Records</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Vaccination Status *</label>
+              <input type="text" id="new-pet-vaccine" required placeholder="e.g., Anti-Rabies & 5-in-1 Done" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Deworming History *</label>
+              <input type="text" id="new-pet-deworm" required placeholder="e.g., Completed (Oct 2026)" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Spay / Neuter Status *</label>
+              <select id="new-pet-spay" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
+                <option value="Spayed / Neutered">Spayed / Neutered</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Not Yet (Too Young)">Not Yet (Too Young)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Illnesses / Injuries / Special Needs</label>
+              <input type="text" id="new-pet-special" placeholder="None, or specify recovery notes..." class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-earth-800 mb-1">Veterinarian Notes</label>
+              <input type="text" id="new-pet-vetnotes" placeholder="Healthy appetite, cleared for adoption" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-cream-200">
+          <button type="button" onclick="closeModal('modal-add-pet')" class="px-4 py-2 rounded-xl bg-cream-100 text-earth-800 text-sm font-semibold">Cancel</button>
+          <button type="submit" class="px-6 py-2 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold">Save Pet Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-earth-900 text-cream-100 mt-16 border-t border-earth-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-sage-600 text-white flex items-center justify-center">
+          <i data-lucide="paw-print" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <p class="font-display font-bold text-sm text-white">KALINGA: Stray Pet Adoption System</p>
+          <p class="text-xs text-cream-200">Brgy. Payompon, Mamburao, Occidental Mindoro • Care, Protection, and Nurturing</p>
+        </div>
+      </div>
+      <p class="text-xs text-cream-200 text-center sm:text-right">
+        Community Animal Welfare & Digital Shelter Management Platform
+      </p>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
+  <!-- ===================================================================== -->
+  <script>
+    // Storage Keys
+    const STORAGE_KEYS = {
+      PETS: 'kalinga_pets_v1',
+      APPLICATIONS: 'kalinga_applications_v1',
+      POST_ADOPTION: 'kalinga_post_adoption_v1'
+    };
+
+    // Initial Realistic Seed Data for Mamburao, Occidental Mindoro
+    const DEFAULT_PETS = [
+      {
+        id: 'KLG-001',
+        name: 'Tala',
+        species: 'Dog',
+        breed: 'Aspin (Asong Pinoy)',
+        age: '1.5 Years',
+        sex: 'Female',
+        color: 'Golden Tan with White Chest',
+        size: 'Medium',
+        weight: '13.5 kg',
+        dateRescued: '2026-08-14',
+        locationFound: 'Brgy. Payompon, Mamburao',
+        temperament: 'Affectionate, gentle, calm around children',
+        status: 'Available',
+        themeBg: '#E1ECE4',
+        themeAccent: '#3B6648',
+        medical: {
+          vaccination: 'Anti-Rabies & 5-in-1 Complete',
+          deworming: 'Completed (Sep 2026)',
+          spayNeuter: 'Spayed',
+          specialNeeds: 'None',
+          vetNotes: 'Cleared by Mamburao Municipal Vet; great energy and healthy coat.'
+        }
+      },
+      {
+        id: 'KLG-002',
+        name: 'Muning',
+        species: 'Cat',
+        breed: 'Puspin (Domestic Shorthair)',
+        age: '8 Months',
+        sex: 'Male',
+        color: 'Orange Tabby & White',
+        size: 'Small',
+        weight: '3.6 kg',
+        dateRescued: '2026-09-02',
+        locationFound: 'Brgy. Balansay, Mamburao',
+        temperament: 'Curious, playful, litter-trained, loves indoor naps',
+        status: 'Available',
+        themeBg: '#FAE6DF',
+        themeAccent: '#C25630',
+        medical: {
+          vaccination: 'Anti-Rabies & 4-in-1 Feline Vaccine',
+          deworming: 'Completed (Oct 2026)',
+          spayNeuter: 'Neutered',
+          specialNeeds: 'Indoor-only home recommended',
+          vetNotes: 'Fully recovered from mild malnutrition upon rescue.'
+        }
+      },
+      {
+        id: 'KLG-003',
+        name: 'Bantay',
+        species: 'Dog',
+        breed: 'Aspin Mix',
+        age: '2 Years',
+        sex: 'Male',
+        color: 'Brindle & Black',
+        size: 'Large',
+        weight: '18.2 kg',
+        dateRescued: '2026-07-21',
+        locationFound: 'Brgy. Tayamaan, Mamburao',
+        temperament: 'Loyal, alert, friendly once acquainted',
+        status: 'Available',
+        themeBg: '#EFE6D5',
+        themeAccent: '#4A3F35',
+        medical: {
+          vaccination: 'Anti-Rabies & 5-in-1 Complete',
+          deworming: 'Completed (Aug 2026)',
+          spayNeuter: 'Neutered',
+          specialNeeds: 'Requires secure fenced yard',
+          vetNotes: 'Strong, active dog suitable for families with outdoor space.'
+        }
+      },
+      {
+        id: 'KLG-004',
+        name: 'Luningning',
+        species: 'Cat',
+        breed: 'Puspin (Calico)',
+        age: '1 Year',
+        sex: 'Female',
+        color: 'Calico (White, Black, Ginger)',
+        size: 'Small',
+        weight: '3.2 kg',
+        dateRescued: '2026-09-18',
+        locationFound: 'Brgy. Fatima, Mamburao',
+        temperament: 'Sweet, quiet, bonds closely with one caregiver',
+        status: 'Fostered',
+        themeBg: '#F2F6F3',
+        themeAccent: '#2E5038',
+        medical: {
+          vaccination: 'Anti-Rabies Done',
+          deworming: 'Completed (Oct 2026)',
+          spayNeuter: 'Spayed',
+          specialNeeds: 'Currently in foster home in Brgy. Fatima; open for meet-ups',
+          vetNotes: 'Thriving well in foster care.'
+        }
+      },
+      {
+        id: 'KLG-005',
+        name: 'Kidlat',
+        species: 'Dog',
+        breed: 'Aspin',
+        age: '6 Months',
+        sex: 'Male',
+        color: 'Cream & Light Brown',
+        size: 'Medium',
+        weight: '9.4 kg',
+        dateRescued: '2026-10-05',
+        locationFound: 'Mamburao Public Market, Poblacion',
+        temperament: 'Energetic puppy, eager to learn, sociable with other dogs',
+        status: 'Medical Care',
+        themeBg: '#FEF3C7',
+        themeAccent: '#B45309',
+        medical: {
+          vaccination: '1st Dose 5-in-1 Given',
+          deworming: 'Ongoing (2nd dose next week)',
+          spayNeuter: 'Not Yet (Too Young)',
+          specialNeeds: 'Finishing skin & tick recovery treatment',
+          vetNotes: 'Will be ready for adoption release in 2 weeks.'
+        }
+      },
+      {
+        id: 'KLG-006',
+        name: 'Sinta',
+        species: 'Dog',
+        breed: 'Aspin',
+        age: '1 Year',
+        sex: 'Female',
+        color: 'White with Brown Ears',
+        size: 'Medium',
+        weight: '12.0 kg',
+        dateRescued: '2026-06-11',
+        locationFound: 'Brgy. Talabaan, Mamburao',
+        temperament: 'Loving, obedient, enjoys morning walks',
+        status: 'Adopted',
+        themeBg: '#E1ECE4',
+        themeAccent: '#3B6648',
+        medical: {
+          vaccination: 'Complete (Anti-Rabies & 5-in-1)',
+          deworming: 'Complete',
+          spayNeuter: 'Spayed',
+          specialNeeds: 'None',
+          vetNotes: 'Successfully rehomed to a loving family in Brgy. Payompon.'
+        }
+      },
+      {
+        id: 'KLG-007',
+        name: 'Kape',
+        species: 'Cat',
+        breed: 'Puspin',
+        age: '5 Months',
+        sex: 'Male',
+        color: 'Dark Brown & Cream Points',
+        size: 'Small',
+        weight: '2.5 kg',
+        dateRescued: '2026-10-12',
+        locationFound: 'Brgy. San Luis, Mamburao',
+        temperament: 'Purr machine, playful with feather toys, gentle',
+        status: 'Available',
+        themeBg: '#F7F3EB',
+        themeAccent: '#4A3F35',
+        medical: {
+          vaccination: 'Anti-Rabies & Core Feline Shot',
+          deworming: 'Completed (Oct 2026)',
+          spayNeuter: 'Scheduled',
+          specialNeeds: 'None',
+          vetNotes: 'Healthy kitten ready for indoor adoption.'
+        }
+      }
+    ];
+
+    const DEFAULT_APPLICATIONS = [
+      {
+        refId: 'APP-2026-101',
+        petId: 'KLG-001',
+        petName: 'Tala',
+        submissionDate: '2026-11-10',
+        method: 'In-Person Shelter Visit',
+        visitDate: '2026-11-16',
+        visitTime: '10:30 AM - 12:00 PM',
+        adopter: {
+          name: 'Elena Rose Mendoza',
+          phone: '0917-832-4410',
+          email: 'elena.mendoza@email.com',
+          address: 'Sitio Proper, Brgy. Payompon, Mamburao, Occ. Mindoro',
+          living: 'Owned House (Fenced Yard)',
+          household: 'Family with Older Kids',
+          otherPets: 'Vaccinated Dog(s)',
+          experience: 'Cared for senior family Aspin for 11 years',
+          emergency: 'Carlos Mendoza - 0918-772-1902'
+        },
+        reason: 'We have a spacious fenced yard and would love to give Tala a safe, loving home alongside our calm senior dog.',
+        status: 'Pending',
+        staffRemarks: 'Verified address in Payompon. Scheduled for shelter meet-and-greet this week.'
+      },
+      {
+        refId: 'APP-2026-102',
+        petId: 'KLG-002',
+        petName: 'Muning',
+        submissionDate: '2026-11-06',
+        method: 'Online Direct Application',
+        visitDate: '',
+        visitTime: '',
+        adopter: {
+          name: 'Mark Anthony Villanueva',
+          phone: '0928-410-9921',
+          email: 'mark.villanueva@email.com',
+          address: 'Brgy. Poblacion 4, Mamburao, Occ. Mindoro',
+          living: 'Owned House (Fenced Yard)',
+          household: 'Adults Only',
+          otherPets: 'None',
+          experience: 'First-time cat owner; prepared indoor litter and scratch post',
+          emergency: 'Ana Villanueva - 0928-410-9922'
+        },
+        reason: 'Working from home in Poblacion and looking for an indoor feline companion.',
+        status: 'Approved',
+        staffRemarks: 'Virtual home check completed. Screened windows verified. Ready for adoption contract signing & release.'
+      },
+      {
+        refId: 'APP-2026-103',
+        petId: 'KLG-006',
+        petName: 'Sinta',
+        submissionDate: '2026-09-25',
+        method: 'In-Person Shelter Visit',
+        visitDate: '2026-09-28',
+        visitTime: '09:00 AM - 10:30 AM',
+        adopter: {
+          name: 'Clarissa Mae Ramos',
+          phone: '0919-605-3381',
+          email: 'clarissa.ramos@email.com',
+          address: 'Brgy. Payompon, Mamburao, Occ. Mindoro',
+          living: 'Owned House (Fenced Yard)',
+          household: 'Family with Older Kids',
+          otherPets: 'None',
+          experience: 'Grew up with rescued dogs in Occidental Mindoro',
+          emergency: 'Roberto Ramos - 0919-605-3380'
+        },
+        reason: 'Our family visited the shelter and immediately bonded with Sinta.',
+        status: 'Completed',
+        staffRemarks: 'Adoption contract signed and pet released on Oct 1, 2026.'
+      }
+    ];
+
+    const DEFAULT_POST_ADOPTION = [
+      {
+        id: 'PA-001',
+        appRefId: 'APP-2026-103',
+        petId: 'KLG-006',
+        petName: 'Sinta',
+        adopterName: 'Clarissa Mae Ramos',
+        date: '2026-10-15',
+        adjustment: 'Thriving & Well-Adjusted',
+        feedback: 'Sinta settled in within 3 days! She loves her morning walks near Payompon beach and sleeps indoors comfortably.',
+        concerns: 'None — booster schedule noted for next year.'
+      },
+      {
+        id: 'PA-002',
+        appRefId: 'APP-2026-103',
+        petId: 'KLG-006',
+        petName: 'Sinta',
+        adopterName: 'Clarissa Mae Ramos',
+        date: '2026-11-02',
+        adjustment: 'Thriving & Well-Adjusted',
+        feedback: 'Healthy appetite and very playful with the kids. Thank you Kalinga team!',
+        concerns: 'None'
+      }
+    ];
+
+    // State Management
+    let pets = [];
+    let applications = [];
+    let postAdoptionLogs = [];
+
+    function loadData() {
+      const storedPets = localStorage.getItem(STORAGE_KEYS.PETS);
+      const storedApps = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+      const storedPA = localStorage.getItem(STORAGE_KEYS.POST_ADOPTION);
+
+      pets = storedPets ? JSON.parse(storedPets) : JSON.parse(JSON.stringify(DEFAULT_PETS));
+      applications = storedApps ? JSON.parse(storedApps) : JSON.parse(JSON.stringify(DEFAULT_APPLICATIONS));
+      postAdoptionLogs = storedPA ? JSON.parse(storedPA) : JSON.parse(JSON.stringify(DEFAULT_POST_ADOPTION));
+
+      saveData();
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
+      localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(applications));
+      localStorage.setItem(STORAGE_KEYS.POST_ADOPTION, JSON.stringify(postAdoptionLogs));
+    }
+
+    function resetDemoData() {
+      localStorage.removeItem(STORAGE_KEYS.PETS);
+      localStorage.removeItem(STORAGE_KEYS.APPLICATIONS);
+      localStorage.removeItem(STORAGE_KEYS.POST_ADOPTION);
+      loadData();
+      refreshAllUI();
+      showToast('Demo records restored to initial Mamburao dataset.', 'info');
+    }
+
+    // Custom Toast Notification (No alert())
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-sage-700 text-white border-sage-800',
+        info: 'bg-earth-800 text-white border-earth-900',
+        warning: 'bg-terracotta-600 text-white border-terracotta-700'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border text-sm font-medium transition-all duration-300 ${colors[type] || colors.success}`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'warning' ? 'alert-circle' : 'check-circle-2'}" class="w-5 h-5 shrink-0"></i>
+        <span class="flex-1">${message}</span>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3800);
+    }
+
+    // Custom SVG Pet Portrait Generator (No external unreliable image URLs)
+    function getPetIllustrationSVG(pet, sizeClass = 'w-28 h-28') {
+      const isDog = pet.species === 'Dog';
+      const accent = pet.themeAccent || (isDog ? '#3B6648' : '#C25630');
+      if (isDog) {
+        return `
+          <svg viewBox="0 0 120 120" class="${sizeClass}" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="54" fill="white" fill-opacity="0.65"/>
+            <!-- Ears -->
+            <path d="M32 45C24 32 22 52 28 64" fill="${accent}" opacity="0.85"/>
+            <path d="M88 45C96 32 98 52 92 64" fill="${accent}" opacity="0.85"/>
+            <!-- Head -->
+            <rect x="34" y="34" width="52" height="54" rx="26" fill="white" stroke="${accent}" stroke-width="3.5"/>
+            <!-- Eyes -->
+            <circle cx="48" cy="56" r="4" fill="#1F1A16"/>
+            <circle cx="72" cy="56" r="4" fill="#1F1A16"/>
+            <circle cx="49" cy="54.5" r="1.2" fill="white"/>
+            <circle cx="73" cy="54.5" r="1.2" fill="white"/>
+            <!-- Snout & Nose -->
+            <ellipse cx="60" cy="68" rx="13" ry="10" fill="#F7F3EB"/>
+            <path d="M55 65C55 63 65 63 65 65C65 68 61.5 70 60 70C58.5 70 55 68 55 65Z" fill="#1F1A16"/>
+            <path d="M54 74C57 77 63 77 66 74" stroke="${accent}" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Collar -->
+            <path d="M42 86H78" stroke="#D96B43" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="60" cy="89" r="3.5" fill="#FBBF24"/>
+          </svg>
+        `;
+      } else {
+        return `
+          <svg viewBox="0 0 120 120" class="${sizeClass}" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="54" fill="white" fill-opacity="0.65"/>
+            <!-- Cat Pointed Ears -->
+            <path d="M35 48L31 24L52 38" fill="${accent}" opacity="0.85"/>
+            <path d="M85 48L89 24L68 38" fill="${accent}" opacity="0.85"/>
+            <!-- Head -->
+            <rect x="32" y="36" width="56" height="50" rx="25" fill="white" stroke="${accent}" stroke-width="3.5"/>
+            <!-- Eyes -->
+            <ellipse cx="47" cy="57" rx="3.8" ry="4.5" fill="#1F1A16"/>
+            <ellipse cx="73" cy="57" rx="3.8" ry="4.5" fill="#1F1A16"/>
+            <circle cx="48" cy="55.5" r="1.2" fill="white"/>
+            <circle cx="74" cy="55.5" r="1.2" fill="white"/>
+            <!-- Nose & Whiskers -->
+            <path d="M57 65H63L60 68.5L57 65Z" fill="#D96B43"/>
+            <path d="M54 71C57 73.5 60 71 60 71C60 71 63 73.5 66 71" stroke="#1F1A16" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="62" x2="38" y2="64" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="69" x2="38" y2="68" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+            <line x1="98" y1="62" x2="82" y2="64" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+            <line x1="98" y1="69" x2="82" y2="68" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        `;
+      }
+    }
+
+    function getStatusBadgeClasses(status) {
+      switch (status) {
+        case 'Available':
+          return 'bg-sage-100 text-sage-800 border border-sage-200';
+        case 'Fostered':
+          return 'bg-sky-100 text-sky-800 border border-sky-200';
+        case 'Medical Care':
+          return 'bg-amber-100 text-amber-800 border border-amber-200';
+        case 'Adopted':
+          return 'bg-terracotta-100 text-terracotta-800 border border-terracotta-200';
+        case 'Pending':
+          return 'bg-amber-100 text-amber-800 border border-amber-200';
+        case 'Approved':
+          return 'bg-sky-100 text-sky-800 border border-sky-200';
+        case 'Completed':
+          return 'bg-sage-100 text-sage-800 border border-sage-200';
+        case 'Rejected':
+          return 'bg-rose-100 text-rose-800 border border-rose-200';
+        default:
+          return 'bg-cream-100 text-earth-800';
+      }
+    }
+
+    // Navigation & Portal Switching
+    function switchPortal(mode) {
+      const publicView = document.getElementById('view-public');
+      const adminView = document.getElementById('view-admin');
+      const btnPublic = document.getElementById('btn-mode-public');
+      const btnAdmin = document.getElementById('btn-mode-admin');
+
+      if (mode === 'public') {
+        publicView.classList.remove('hidden');
+        adminView.classList.add('hidden');
+        btnPublic.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-sage-600 text-white shadow-sm';
+        btnAdmin.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-earth-700 hover:text-earth-900';
+      } else {
+        publicView.classList.add('hidden');
+        adminView.classList.remove('hidden');
+        btnAdmin.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-sage-600 text-white shadow-sm';
+        btnPublic.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-earth-700 hover:text-earth-900';
+      }
+      refreshAllUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchAdminTab(tabName) {
+      const tabs = ['pets', 'applications', 'postadoption', 'reports'];
+      tabs.forEach(t => {
+        document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        btn.classList.remove('tab-active');
+        btn.classList.add('text-earth-700');
+      });
+      document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      activeBtn.classList.add('tab-active');
+      activeBtn.classList.remove('text-earth-700');
+
+      if (tabName === 'reports') renderReportPreview();
+      if (tabName === 'postadoption') populatePostAdoptionPetDropdown();
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function printSection(elementId) {
+      const target = document.getElementById(elementId);
+      if (!target) return;
+      target.setAttribute('id', 'printable-area');
+      window.print();
+      target.setAttribute('id', elementId);
+    }
+
+    // =====================================================================
+    // PUBLIC ADOPTER PORTAL LOGIC
+    // =====================================================================
+    function updateHeroStats() {
+      const availableCount = pets.filter(p => p.status === 'Available').length;
+      const adoptedCount = pets.filter(p => p.status === 'Adopted').length;
+      document.getElementById('hero-stat-available').textContent = availableCount;
+      document.getElementById('hero-stat-rescued').textContent = pets.length;
+      document.getElementById('hero-stat-adopted').textContent = adoptedCount;
+    }
+
+    function resetPublicFilters() {
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-species').value = 'All';
+      document.getElementById('filter-size').value = 'All';
+      document.getElementById('filter-status').value = 'All';
+      renderPublicPets();
+    }
+
+    function renderPublicPets() {
+      const search = document.getElementById('filter-search').value.toLowerCase().trim();
+      const species = document.getElementById('filter-species').value;
+      const size = document.getElementById('filter-size').value;
+      const status = document.getElementById('filter-status').value;
+
+      const filtered = pets.filter(pet => {
+        const matchesSearch = !search ||
+          pet.name.toLowerCase().includes(search) ||
+          pet.breed.toLowerCase().includes(search) ||
+          pet.locationFound.toLowerCase().includes(search) ||
+          pet.id.toLowerCase().includes(search);
+        const matchesSpecies = species === 'All' || pet.species === species;
+        const matchesSize = size === 'All' || pet.size === size;
+        const matchesStatus = status === 'All' || pet.status === status;
+        return matchesSearch && matchesSpecies && matchesSize && matchesStatus;
+      });
+
+      const grid = document.getElementById('public-pet-grid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white rounded-3xl p-12 text-center border border-cream-200">
+            <i data-lucide="search-x" class="w-10 h-10 text-earth-700 mx-auto mb-3 opacity-60"></i>
+            <h3 class="font-display font-bold text-lg text-earth-900">No matching pets found</h3>
+            <p class="text-sm text-earth-700 mt-1">Try adjusting your search keywords or status filter to see more rescued animals.</p>
+            <button onclick="resetPublicFilters()" class="mt-4 px-4 py-2 rounded-xl bg-sage-600 text-white text-xs font-semibold">Show All Pets</button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(pet => {
+        const canApply = pet.status === 'Available' || pet.status === 'Fostered';
+        return `
+          <div class="bg-white rounded-3xl border border-cream-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
+            <!-- Visual Header Banner -->
+            <div class="relative p-6 flex items-center justify-center" style="background-color: ${pet.themeBg || '#E1ECE4'}">
+              <span class="absolute top-3.5 left-3.5 text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-white/90 text-earth-800 shadow-xs">
+                ${pet.id}
+              </span>
+              <span class="absolute top-3.5 right-3.5 text-xs font-semibold px-3 py-1 rounded-full shadow-xs ${getStatusBadgeClasses(pet.status)}">
+                ${pet.status}
+              </span>
+              ${getPetIllustrationSVG(pet, 'w-28 h-28 drop-shadow-xs')}
+            </div>
+
+            <!-- Card Content -->
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 class="font-display font-extrabold text-xl text-earth-900">${pet.name}</h3>
+                    <p class="text-xs font-medium text-earth-700">${pet.breed} • ${pet.sex} • ${pet.age}</p>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-lg bg-cream-100 text-earth-800 text-xs font-semibold">${pet.size}</span>
+                </div>
+
+                <div class="mt-3 space-y-1.5 text-xs text-earth-700">
+                  <div class="flex items-center gap-1.5">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-terracotta-600 shrink-0"></i>
+                    <span class="truncate">Rescued in ${pet.locationFound}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <i data-lucide="syringe" class="w-3.5 h-3.5 text-sage-600 shrink-0"></i>
+                    <span class="truncate">${pet.medical.vaccination}</span>
+                  </div>
+                </div>
+
+                <p class="mt-3 text-xs text-earth-800 bg-cream-50 p-2.5 rounded-xl border border-cream-200 line-clamp-2">
+                  "${pet.temperament}"
+                </p>
+              </div>
+
+              <!-- Card Action Buttons -->
+              <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-cream-200">
+                <button onclick="openPetDetailModal('${pet.id}')" class="px-3 py-2.5 rounded-xl bg-cream-100 hover:bg-cream-200 text-earth-900 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                  <span>Full Profile</span>
+                </button>
+                ${canApply ? `
+                  <button onclick="openApplyModal('${pet.id}')" class="px-3 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-xs">
+                    <i data-lucide="heart" class="w-3.5 h-3.5"></i>
+                    <span>Adopt / Visit</span>
+                  </button>
+                ` : `
+                  <button disabled class="px-3 py-2.5 rounded-xl bg-cream-100 text-earth-700/60 text-xs font-semibold cursor-not-allowed">
+                    ${pet.status === 'Adopted' ? 'Rehomed' : 'In Recovery'}
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openPetDetailModal(petId) {
+      const pet = pets.find(p => p.id === petId);
+      if (!pet) return;
+
+      document.getElementById('detail-pet-id').textContent = pet.id;
+      const badge = document.getElementById('detail-pet-status-badge');
+      badge.textContent = pet.status;
+      badge.className = `text-xs font-semibold px-3 py-1 rounded-full ${getStatusBadgeClasses(pet.status)}`;
+
+      const canApply = pet.status === 'Available' || pet.status === 'Fostered';
+
+      document.getElementById('detail-pet-content').innerHTML = `
+        <div class="flex flex-col sm:flex-row items-center gap-6 p-5 rounded-2xl" style="background-color: ${pet.themeBg || '#E1ECE4'}">
+          ${getPetIllustrationSVG(pet, 'w-32 h-32 shrink-0')}
+          <div class="text-center sm:text-left space-y-1.5">
+            <div class="inline-block px-2.5 py-0.5 rounded-md bg-white/80 text-earth-800 text-xs font-semibold">${pet.species} • ${pet.breed}</div>
+            <h2 class="font-display font-extrabold text-3xl text-earth-900">${pet.name}</h2>
+            <p class="text-sm text-earth-800 font-medium">${pet.temperament}</p>
+          </div>
+        </div>
+
+        <!-- Pet Profile Data -->
+        <div>
+          <h4 class="font-display font-bold text-sm uppercase tracking-wider text-earth-700 mb-3 flex items-center gap-2">
+            <i data-lucide="paw-print" class="w-4 h-4 text-sage-600"></i>
+            <span>Pet Profile & Rescue History</span>
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+              <span class="text-xs text-earth-700 block">Estimated Age</span>
+              <strong class="text-earth-900">${pet.age}</strong>
+            </div>
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+              <span class="text-xs text-earth-700 block">Sex</span>
+              <strong class="text-earth-900">${pet.sex}</strong>
+            </div>
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+              <span class="text-xs text-earth-700 block">Size & Weight</span>
+              <strong class="text-earth-900">${pet.size} (${pet.weight})</strong>
+            </div>
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+              <span class="text-xs text-earth-700 block">Color / Markings</span>
+              <strong class="text-earth-900">${pet.color}</strong>
+            </div>
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+              <span class="text-xs text-earth-700 block">Date Rescued</span>
+              <strong class="text-earth-900">${pet.dateRescued}</strong>
+            </div>
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+              <span class="text-xs text-earth-700 block">Location Found</span>
+              <strong class="text-earth-900">${pet.locationFound}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medical & Care Data -->
+        <div>
+          <h4 class="font-display font-bold text-sm uppercase tracking-wider text-earth-700 mb-3 flex items-center gap-2">
+            <i data-lucide="stethoscope" class="w-4 h-4 text-terracotta-600"></i>
+            <span>Medical & Veterinary Care Records</span>
+          </h4>
+          <div class="bg-sage-50/70 border border-sage-200 rounded-2xl p-4 space-y-2.5 text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <span class="text-xs text-earth-700 block">Vaccination Status</span>
+                <strong class="text-sage-800">${pet.medical.vaccination}</strong>
+              </div>
+              <div>
+                <span class="text-xs text-earth-700 block">Deworming History</span>
+                <strong class="text-sage-800">${pet.medical.deworming}</strong>
+              </div>
+              <div>
+                <span class="text-xs text-earth-700 block">Spay / Neuter Status</span>
+                <strong class="text-sage-800">${pet.medical.spayNeuter}</strong>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-sage-200/70">
+              <span class="text-xs text-earth-700 block">Special Dietary / Medical Needs</span>
+              <strong class="text-earth-900">${pet.medical.specialNeeds}</strong>
+            </div>
+            <div>
+              <span class="text-xs text-earth-700 block">Veterinarian Notes</span>
+              <p class="text-earth-800 text-xs mt-0.5">${pet.medical.vetNotes}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-cream-200">
+          <button onclick="closeModal('modal-pet-detail')" class="px-4 py-2.5 rounded-xl bg-cream-100 hover:bg-cream-200 text-earth-800 text-sm font-semibold">Close</button>
+          ${canApply ? `
+            <button onclick="closeModal('modal-pet-detail'); openApplyModal('${pet.id}')" class="px-6 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold shadow-sm flex items-center gap-2">
+              <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+              <span>Apply to Adopt or Schedule Visit</span>
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      openModal('modal-pet-detail');
+    }
+
+    // Adoption / Visit Application Modal Logic
+    function openApplyModal(petId) {
+      const pet = pets.find(p => p.id === petId);
+      if (!pet) return;
+
+      document.getElementById('adoption-form').reset();
+      document.getElementById('apply-pet-id').value = pet.id;
+      document.getElementById('apply-pet-subtitle').textContent = `Applying for: ${pet.name} (${pet.id} • ${pet.species}, ${pet.locationFound})`;
+      toggleVisitDateField();
+      openModal('modal-apply');
+    }
+
+    function toggleVisitDateField() {
+      const method = document.querySelector('input[name="adoptionMethod"]:checked').value;
+      const box = document.getElementById('visit-schedule-box');
+      const dateInput = document.getElementById('apply-visit-date');
+      if (method === 'In-Person Shelter Visit') {
+        box.classList.remove('hidden');
+        dateInput.required = true;
+      } else {
+        box.classList.add('hidden');
+        dateInput.required = false;
+      }
+    }
+
+    function handleAdoptionSubmit(event) {
+      event.preventDefault();
+      const petId = document.getElementById('apply-pet-id').value;
+      const pet = pets.find(p => p.id === petId);
+      if (!pet) return;
+
+      const method = document.querySelector('input[name="adoptionMethod"]:checked').value;
+      const visitDate = document.getElementById('apply-visit-date').value;
+      const visitTime = document.getElementById('apply-visit-time').value;
+
+      const nextNum = 101 + applications.length;
+      const refId = `APP-2026-${nextNum}`;
+      const today = new Date().toISOString().split('T')[0];
+
+      const newApp = {
+        refId,
+        petId: pet.id,
+        petName: pet.name,
+        submissionDate: today,
+        method,
+        visitDate: method === 'In-Person Shelter Visit' ? visitDate : '',
+        visitTime: method === 'In-Person Shelter Visit' ? visitTime : '',
+        adopter: {
+          name: document.getElementById('apply-name').value.trim(),
+          phone: document.getElementById('apply-phone').value.trim(),
+          email: document.getElementById('apply-email').value.trim(),
+          address: document.getElementById('apply-address').value.trim(),
+          living: document.getElementById('apply-living').value,
+          household: document.getElementById('apply-household').value,
+          otherPets: document.getElementById('apply-other-pets').value,
+          experience: document.getElementById('apply-experience').value.trim(),
+          emergency: document.getElementById('apply-emergency').value.trim()
+        },
+        reason: document.getElementById('apply-reason').value.trim(),
+        status: 'Pending',
+        staffRemarks: 'Application received online. Pending initial staff screening.'
+      };
+
+      applications.unshift(newApp);
+      saveData();
+      refreshAllUI();
+      closeModal('modal-apply');
+      showConfirmationSlip(newApp);
+      showToast(`Application ${refId} submitted successfully!`, 'success');
+    }
+
+    function showConfirmationSlip(app) {
+      const slipContainer = document.getElementById('slip-printable-content');
+      const isVisit = app.method === 'In-Person Shelter Visit';
+
+      slipContainer.innerHTML = `
+        <div class="flex items-center justify-between border-b border-cream-200 pb-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-sage-600 text-white flex items-center justify-center">
+              <i data-lucide="paw-print" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-extrabold text-base text-earth-900">KALINGA ADOPTION SYSTEM</h3>
+              <p class="text-[11px] text-earth-700">Brgy. Payompon, Mamburao, Occidental Mindoro</p>
+            </div>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeClasses(app.status)}">${app.status}</span>
+        </div>
+
+        <div class="bg-sage-50 border border-sage-200 rounded-2xl p-4 text-center">
+          <p class="text-xs font-semibold uppercase tracking-wider text-sage-700">Official Application Reference ID</p>
+          <p class="font-mono font-extrabold text-2xl text-earth-900 mt-1">${app.refId}</p>
+          <p class="text-xs text-earth-700 mt-1">Keep this ID to track your screening status or submit post-adoption check-ins.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+            <span class="text-earth-700 block">Selected Pet</span>
+            <strong class="text-sm text-earth-900">${app.petName} (${app.petId})</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+            <span class="text-earth-700 block">Engagement Method</span>
+            <strong class="text-sm text-earth-900">${app.method}</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+            <span class="text-earth-700 block">Applicant Name</span>
+            <strong class="text-earth-900">${app.adopter.name}</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
+            <span class="text-earth-700 block">Submission Date</span>
+            <strong class="text-earth-900">${app.submissionDate}</strong>
+          </div>
+        </div>
+
+        ${isVisit ? `
+          <div class="p-4 rounded-2xl bg-terracotta-50 border border-terracotta-200 space-y-1">
+            <div class="flex items-center gap-2 text-terracotta-800 font-bold text-xs uppercase tracking-wider">
+              <i data-lucide="calendar-check" class="w-4 h-4"></i>
+              <span>Scheduled Shelter Visit Appointment Slip</span>
+            </div>
+            <p class="text-sm font-bold text-earth-900">Date: ${app.visitDate} • Time: ${app.visitTime}</p>
+            <p class="text-xs text-earth-700">Location: Kalinga Mamburao Rescue Shelter, Brgy. Payompon. Please bring a valid ID.</p>
+          </div>
+        ` : ''}
+
+        <div class="text-xs text-earth-700 border-t border-cream-200 pt-3">
+          <strong>Address:</strong> ${app.adopter.address} • <strong>Contact:</strong> ${app.adopter.phone}
+        </div>
+      `;
+
+      openModal('modal-slip');
+    }
+
+    // Application Status Tracker & Adopter Post-Adoption Check-In
+    function openTrackerModal() {
+      openModal('modal-tracker');
+    }
+
+    function quickFillTracker(refId) {
+      document.getElementById('tracker-ref-input').value = refId;
+      lookupApplicationStatus();
+    }
+
+    function lookupApplicationStatus() {
+      const input = document.getElementById('tracker-ref-input').value.trim().toUpperCase();
+      const container = document.getElementById('tracker-result-container');
+      const app = applications.find(a => a.refId.toUpperCase() === input);
+
+      if (!app) {
+        container.innerHTML = `
+          <div class="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-center">
+            <p class="text-sm font-bold text-rose-800">No application found for "${input}"</p>
+            <p class="text-xs text-rose-700 mt-1">Please check your Reference ID (e.g., APP-2026-101) and try again.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const steps = ['Pending', 'Approved', 'Completed'];
+      const currentIdx = steps.indexOf(app.status);
+      const petLogs = postAdoptionLogs.filter(l => l.appRefId === app.refId);
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl bg-cream-50 border border-cream-200 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="text-xs font-mono font-bold text-earth-700">${app.refId}</span>
+              <h4 class="font-display font-bold text-lg text-earth-900">${app.adopter.name} → ${app.petName} (${app.petId})</h4>
+              <p class="text-xs text-earth-700">${app.method} • Submitted ${app.submissionDate}</p>
+            </div>
+            <span class="px-3.5 py-1.5 rounded-full text-xs font-bold ${getStatusBadgeClasses(app.status)}">${app.status}</span>
+          </div>
+
+          <!-- Progress Stepper -->
+          ${app.status !== 'Rejected' ? `
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+              ${steps.map((step, idx) => {
+                const active = idx <= currentIdx;
+                return `
+                  <div class="p-2.5 rounded-xl border ${active ? 'bg-sage-600 text-white border-sage-700 font-semibold' : 'bg-cream-50 text-earth-700 border-cream-200'}">
+                    ${idx + 1}. ${step}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          ` : ''}
+
+          <div class="p-4 rounded-2xl bg-sage-50/70 border border-sage-200 text-xs space-y-1">
+            <span class="font-bold text-sage-800 uppercase tracking-wider">Shelter Staff Screening Remarks:</span>
+            <p class="text-earth-900 text-sm">${app.staffRemarks || 'Under review by shelter coordinator.'}</p>
+            ${app.visitDate ? `<p class="text-terracotta-700 font-semibold pt-1">Scheduled Visit: ${app.visitDate} (${app.visitTime})</p>` : ''}
+          </div>
+
+          <div class="flex justify-end">
+            <button onclick='showConfirmationSlip(${JSON.stringify(app).replace(/'/g, "&apos;")})' class="text-xs font-semibold text-sage-700 hover:underline flex items-center gap-1">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              <span>View / Print Application Slip</span>
+            </button>
+          </div>
+
+          <!-- Post-Adoption Welfare Submission if Completed -->
+          ${app.status === 'Completed' ? `
+            <div class="border-t border-cream-200 pt-4 space-y-3">
+              <h5 class="font-display font-bold text-sm text-earth-900 flex items-center gap-2">
+                <i data-lucide="heart-pulse" class="w-4 h-4 text-terracotta-600"></i>
+                <span>Submit Post-Adoption Welfare Check-In for ${app.petName}</span>
+              </h5>
+              <form onsubmit="handlePublicPostAdoptionSubmit(event, '${app.refId}', '${app.petId}', '${app.petName}', '${app.adopter.name}')" class="space-y-2.5 bg-cream-50 p-4 rounded-2xl border border-cream-200">
+                <div>
+                  <label class="block text-xs font-semibold text-earth-800 mb-1">How is ${app.petName} adjusting?</label>
+                  <select id="pub-pa-adjustment" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-xs">
+                    <option value="Thriving & Well-Adjusted">Thriving & Well-Adjusted</option>
+                    <option value="Gradually Adjusting">Gradually Adjusting</option>
+                    <option value="Needs Behavioral/Vet Guidance">Needs Behavioral/Vet Guidance</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-earth-800 mb-1">Home Update & Feedback *</label>
+                  <textarea id="pub-pa-feedback" rows="2" required placeholder="Share how your adopted pet is doing..." class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-xs"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-earth-800 mb-1">Any Concerns or Assistance Needed?</label>
+                  <input type="text" id="pub-pa-concerns" placeholder="None" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-xs" />
+                </div>
+                <button type="submit" class="px-4 py-2 rounded-xl bg-terracotta-600 hover:bg-terracotta-700 text-white text-xs font-semibold">
+                  Send Post-Adoption Update
+                </button>
+              </form>
+
+              ${petLogs.length > 0 ? `
+                <div class="space-y-2">
+                  <p class="text-xs font-bold text-earth-700">Previous Check-Ins (${petLogs.length}):</p>
+                  ${petLogs.map(log => `
+                    <div class="p-3 rounded-xl bg-white border border-cream-200 text-xs">
+                      <div class="flex justify-between font-semibold text-earth-900">
+                        <span>${log.adjustment}</span>
+                        <span class="text-earth-700">${log.date}</span>
+                      </div>
+                      <p class="text-earth-700 mt-1">${log.feedback}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function handlePublicPostAdoptionSubmit(event, appRefId, petId, petName, adopterName) {
+      event.preventDefault();
+      const newLog = {
+        id: `PA-${String(postAdoptionLogs.length + 1).padStart(3, '0')}`,
+        appRefId,
+        petId,
+        petName,
+        adopterName,
+        date: new Date().toISOString().split('T')[0],
+        adjustment: document.getElementById('pub-pa-adjustment').value,
+        feedback: document.getElementById('pub-pa-feedback').value.trim(),
+        concerns: document.getElementById('pub-pa-concerns').value.trim() || 'None'
+      };
+      postAdoptionLogs.unshift(newLog);
+      saveData();
+      refreshAllUI();
+      lookupApplicationStatus();
+      showToast('Thank you! Post-adoption update recorded for shelter staff.', 'success');
+    }
+
+    // =====================================================================
+    // SHELTER STAFF & ADMIN DASHBOARD LOGIC
+    // =====================================================================
+    function updateAdminKPIs() {
+      const total = pets.length;
+      const dogs = pets.filter(p => p.species === 'Dog').length;
+      const cats = pets.filter(p => p.species === 'Cat').length;
+      const available = pets.filter(p => p.status === 'Available').length;
+      const fostered = pets.filter(p => p.status === 'Fostered').length;
+      const medical = pets.filter(p => p.status === 'Medical Care').length;
+      const adopted = pets.filter(p => p.status === 'Adopted').length;
+      const pendingApps = applications.filter(a => a.status === 'Pending').length;
+
+      document.getElementById('kpi-total-pets').textContent = total;
+      document.getElementById('kpi-species-split').textContent = `${dogs} Dogs • ${cats} Cats`;
+      document.getElementById('kpi-available-pets').textContent = available;
+      document.getElementById('kpi-pending-apps').textContent = pendingApps;
+      document.getElementById('kpi-completed-adoptions').textContent = adopted;
+      document.getElementById('kpi-followup-count').textContent = `${postAdoptionLogs.length} Welfare checks logged`;
+      document.getElementById('badge-pending-count').textContent = pendingApps;
+
+      // Render Status Distribution Bar
+      const chartBar = document.getElementById('status-chart-bar');
+      if (total === 0) {
+        chartBar.innerHTML = '';
+        return;
+      }
+      const segments = [
+        { count: available, color: 'bg-sage-500', label: 'Available' },
+        { count: fostered, color: 'bg-sky-500', label: 'Fostered' },
+        { count: medical, color: 'bg-amber-500', label: 'Medical Care' },
+        { count: adopted, color: 'bg-terracotta-500', label: 'Adopted' }
+      ];
+      chartBar.innerHTML = segments.map(s => {
+        const pct = (s.count / total) * 100;
+        return pct > 0 ? `<div style="width: ${pct}%" class="${s.color} h-full transition-all duration-500" title="${s.label}: ${s.count}"></div>` : '';
+      }).join('');
+    }
+
+    function renderAdminPetsTable() {
+      const search = document.getElementById('admin-pet-search').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('admin-pet-status-filter').value;
+
+      const filtered = pets.filter(p => {
+        const matchText = !search ||
+          p.id.toLowerCase().includes(search) ||
+          p.name.toLowerCase().includes(search) ||
+          p.locationFound.toLowerCase().includes(search) ||
+          p.breed.toLowerCase().includes(search);
+        const matchStatus = statusFilter === 'All' || p.status === statusFilter;
+        return matchText && matchStatus;
+      });
+
+      const tbody = document.getElementById('admin-pets-tbody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-earth-700">No pet records match your current filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(pet => `
+        <tr class="hover:bg-cream-50/70 transition">
+          <td class="py-3.5 px-4">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-color: ${pet.themeBg || '#E1ECE4'}">
+                ${getPetIllustrationSVG(pet, 'w-9 h-9')}
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-xs font-bold text-earth-700">${pet.id}</span>
+                  <span class="font-bold text-earth-900">${pet.name}</span>
+                </div>
+                <p class="text-xs text-earth-700">${pet.species} • ${pet.breed} • ${pet.sex}, ${pet.age}</p>
+              </div>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 text-xs">
+            <div class="font-medium text-earth-900">${pet.locationFound}</div>
+            <div class="text-earth-700">Rescued: ${pet.dateRescued}</div>
+          </td>
+          <td class="py-3.5 px-4 text-xs">
+            <div class="font-medium text-sage-800">${pet.medical.vaccination}</div>
+            <div class="text-earth-700">${pet.medical.spayNeuter} • ${pet.size} (${pet.weight})</div>
+          </td>
+          <td class="py-3.5 px-4">
+            <select onchange="updatePetStatus('${pet.id}', this.value)" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer ${getStatusBadgeClasses(pet.status)}">
+              <option value="Available" ${pet.status === 'Available' ? 'selected' : ''}>Available</option>
+              <option value="Fostered" ${pet.status === 'Fostered' ? 'selected' : ''}>Fostered</option>
+              <option value="Medical Care" ${pet.status === 'Medical Care' ? 'selected' : ''}>Medical Care</option>
+              <option value="Adopted" ${pet.status === 'Adopted' ? 'selected' : ''}>Adopted</option>
+            </select>
+          </td>
+          <td class="py-3.5 px-4 text-right">
+            <button onclick="openPetDetailModal('${pet.id}')" class="px-3 py-1.5 rounded-lg bg-cream-100 hover:bg-cream-200 text-earth-800 text-xs font-semibold">
+              View Details
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updatePetStatus(petId, newStatus) {
+      const pet = pets.find(p => p.id === petId);
+      if (!pet) return;
+      pet.status = newStatus;
+      saveData();
+      refreshAllUI();
+      showToast(`Updated ${pet.name} (${pet.id}) status to ${newStatus}.`, 'success');
+    }
+
+    function openAddPetModal() {
+      document.getElementById('new-pet-date').value = new Date().toISOString().split('T')[0];
+      openModal('modal-add-pet');
+    }
+
+    function handleAddPetSubmit(event) {
+      event.preventDefault();
+      const species = document.getElementById('new-pet-species').value;
+      const nextNum = String(pets.length + 1).padStart(3, '0');
+      const newPet = {
+        id: `KLG-${nextNum}`,
+        name: document.getElementById('new-pet-name').value.trim(),
+        species,
+        breed: document.getElementById('new-pet-breed').value.trim(),
+        age: document.getElementById('new-pet-age').value.trim(),
+        sex: document.getElementById('new-pet-sex').value,
+        color: document.getElementById('new-pet-color').value.trim(),
+        size: document.getElementById('new-pet-size').value,
+        weight: document.getElementById('new-pet-weight').value.trim(),
+        dateRescued: document.getElementById('new-pet-date').value,
+        locationFound: document.getElementById('new-pet-location').value.trim(),
+        temperament: document.getElementById('new-pet-temperament').value.trim(),
+        status: document.getElementById('new-pet-status').value,
+        themeBg: species === 'Dog' ? '#E1ECE4' : '#FAE6DF',
+        themeAccent: species === 'Dog' ? '#3B6648' : '#C25630',
+        medical: {
+          vaccination: document.getElementById('new-pet-vaccine').value.trim(),
+          deworming: document.getElementById('new-pet-deworm').value.trim(),
+          spayNeuter: document.getElementById('new-pet-spay').value,
+          specialNeeds: document.getElementById('new-pet-special').value.trim() || 'None',
+          vetNotes: document.getElementById('new-pet-vetnotes').value.trim() || 'Initial intake exam completed.'
+        }
+      };
+
+      pets.unshift(newPet);
+      saveData();
+      refreshAllUI();
+      event.target.reset();
+      closeModal('modal-add-pet');
+      showToast(`Registered ${newPet.name} (${newPet.id}) into Kalinga database!`, 'success');
+    }
+
+    // Admin Applications Screening
+    function renderAdminApplications() {
+      const filter = document.getElementById('admin-app-filter').value;
+      const filtered = applications.filter(a => filter === 'All' || a.status === filter);
+      const container = document.getElementById('admin-applications-list');
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="bg-white p-8 rounded-2xl border border-cream-200 text-center text-sm text-earth-700">No applications found under "${filter}".</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(app => `
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-start justify-between gap-3 border-b border-cream-200 pb-3">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded-md bg-earth-800 text-white">${app.refId}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusBadgeClasses(app.status)}">${app.status}</span>
+                <span class="text-xs font-semibold text-terracotta-700 bg-terracotta-50 px-2.5 py-0.5 rounded-md">${app.method}</span>
+              </div>
+              <h3 class="font-display font-bold text-lg text-earth-900 mt-1.5">
+                Applicant: ${app.adopter.name} <span class="text-earth-700 font-normal text-sm">→ Pet:</span> <span class="text-sage-700">${app.petName} (${app.petId})</span>
+              </h3>
+              <p class="text-xs text-earth-700">Submitted: ${app.submissionDate} ${app.visitDate ? `• Scheduled Visit: ${app.visitDate} (${app.visitTime})` : ''}</p>
+            </div>
+
+            <!-- Workflow Action Controls -->
+            <div class="flex flex-wrap items-center gap-2">
+              <select onchange="updateApplicationStatus('${app.refId}', this.value)" class="px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-xs font-bold text-earth-900">
+                <option value="Pending" ${app.status === 'Pending' ? 'selected' : ''}>Status: Pending</option>
+                <option value="Approved" ${app.status === 'Approved' ? 'selected' : ''}>Status: Approved</option>
+                <option value="Completed" ${app.status === 'Completed' ? 'selected' : ''}>Status: Completed (Release Pet)</option>
+                <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Status: Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Adopter Suitability Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs bg-cream-50 p-3.5 rounded-xl border border-cream-200">
+            <div>
+              <span class="text-earth-700 block">Contact & Email</span>
+              <strong class="text-earth-900">${app.adopter.phone}</strong><br/>
+              <span class="text-earth-700">${app.adopter.email}</span>
+            </div>
+            <div>
+              <span class="text-earth-700 block">Address / Barangay</span>
+              <strong class="text-earth-900">${app.adopter.address}</strong>
+            </div>
+            <div>
+              <span class="text-earth-700 block">Living & Household</span>
+              <strong class="text-earth-900">${app.adopter.living}</strong><br/>
+              <span class="text-earth-700">${app.adopter.household} • Pets: ${app.adopter.otherPets}</span>
+            </div>
+            <div>
+              <span class="text-earth-700 block">Experience & Emergency</span>
+              <strong class="text-earth-900">${app.adopter.experience}</strong><br/>
+              <span class="text-earth-700">Emerg: ${app.adopter.emergency}</span>
+            </div>
+          </div>
+
+          <div class="text-xs text-earth-800">
+            <strong>Adopter's Reason:</strong> "${app.reason}"
+          </div>
+
+          <!-- Staff Screening Remarks -->
+          <div class="flex flex-col sm:flex-row gap-2 pt-1">
+            <input type="text" id="remarks-${app.refId}" value="${app.staffRemarks || ''}" placeholder="Add screening / interview / home visit remarks..." class="flex-1 px-3.5 py-2 rounded-xl bg-cream-50 border border-cream-200 text-xs" />
+            <button onclick="saveStaffRemarks('${app.refId}')" class="px-4 py-2 rounded-xl bg-earth-800 hover:bg-earth-900 text-white text-xs font-semibold shrink-0">
+              Save Remarks
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveStaffRemarks(refId) {
+      const app = applications.find(a => a.refId === refId);
+      if (!app) return;
+      app.staffRemarks = document.getElementById(`remarks-${refId}`).value.trim();
+      saveData();
+      showToast(`Saved screening remarks for ${refId}.`, 'success');
+    }
+
+    function updateApplicationStatus(refId, newStatus) {
+      const app = applications.find(a => a.refId === refId);
+      if (!app) return;
+
+      // Save any typed remarks before updating status
+      const remarkInput = document.getElementById(`remarks-${refId}`);
+      if (remarkInput) app.staffRemarks = remarkInput.value.trim();
+
+      app.status = newStatus;
+
+      // If Completed, automatically mark pet as Adopted
+      if (newStatus === 'Completed') {
+        const pet = pets.find(p => p.id === app.petId);
+        if (pet) {
+          pet.status = 'Adopted';
+        }
+        showToast(`Application ${refId} Completed! ${app.petName} is now marked as Adopted.`, 'success');
+      } else {
+        showToast(`Application ${refId} updated to ${newStatus}.`, 'info');
+      }
+
+      saveData();
+      refreshAllUI();
+    }
+
+    // Admin Post-Adoption Monitoring
+    function populatePostAdoptionPetDropdown() {
+      const select = document.getElementById('pa-pet-select');
+      const completedApps = applications.filter(a => a.status === 'Completed' || a.status === 'Approved');
+      if (completedApps.length === 0) {
+        select.innerHTML = `<option value="">No completed adoptions yet</option>`;
+        return;
+      }
+      select.innerHTML = completedApps.map(a =>
+        `<option value="${a.refId}|${a.petId}|${a.petName}|${a.adopter.name}">${a.petName} (${a.petId}) — Adopter: ${a.adopter.name} [${a.refId}]</option>`
+      ).join('');
+      document.getElementById('pa-date').value = new Date().toISOString().split('T')[0];
+    }
+
+    function handleAdminPostAdoptionSubmit(event) {
+      event.preventDefault();
+      const val = document.getElementById('pa-pet-select').value;
+      if (!val) {
+        showToast('Please select an adopted pet first.', 'warning');
+        return;
+      }
+      const [appRefId, petId, petName, adopterName] = val.split('|');
+
+      const newLog = {
+        id: `PA-${String(postAdoptionLogs.length + 1).padStart(3, '0')}`,
+        appRefId,
+        petId,
+        petName,
+        adopterName,
+        date: document.getElementById('pa-date').value,
+        adjustment: document.getElementById('pa-adjustment').value,
+        feedback: document.getElementById('pa-feedback').value.trim(),
+        concerns: document.getElementById('pa-concerns').value.trim() || 'None'
+      };
+
+      postAdoptionLogs.unshift(newLog);
+      saveData();
+      refreshAllUI();
+      document.getElementById('pa-feedback').value = '';
+      document.getElementById('pa-concerns').value = '';
+      showToast(`Logged post-adoption welfare follow-up for ${petName}.`, 'success');
+    }
+
+    function renderAdminPostAdoptionLogs() {
+      document.getElementById('pa-total-badge').textContent = `${postAdoptionLogs.length} Records`;
+      const container = document.getElementById('admin-postadoption-list');
+
+      if (postAdoptionLogs.length === 0) {
+        container.innerHTML = `<div class="bg-white p-6 rounded-2xl border border-cream-200 text-sm text-earth-700">No post-adoption follow-ups recorded yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = postAdoptionLogs.map(log => `
+        <div class="bg-white p-4 rounded-2xl border border-cream-200 shadow-sm space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-xs font-mono font-bold text-earth-700">${log.id} • ${log.appRefId}</span>
+              <h4 class="font-display font-bold text-base text-earth-900">${log.petName} (${log.petId}) — Adopter: ${log.adopterName}</h4>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold ${log.adjustment.includes('Thriving') ? 'bg-sage-100 text-sage-800' : 'bg-amber-100 text-amber-800'}">
+              ${log.adjustment}
+            </span>
+          </div>
+          <p class="text-xs text-earth-800 bg-cream-50 p-3 rounded-xl border border-cream-200">"${log.feedback}"</p>
+          <div class="flex flex-wrap items-center justify-between text-xs text-earth-700">
+            <span><strong>Follow-Up Date:</strong> ${log.date}</span>
+            <span><strong>Concerns / Assistance:</strong> ${log.concerns}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Shelter Reports Generator
+    function renderReportPreview() {
+      const type = document.getElementById('report-type-select').value;
+      const box = document.getElementById('report-printable-box');
+      const today = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const headerHTML = `
+        <div class="border-b-2 border-earth-800 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="font-display font-extrabold text-xl text-earth-900">KALINGA: STRAY PET ADOPTION SYSTEM</h2>
+            <p class="text-xs text-earth-700">Mamburao & Occidental Mindoro Community Rescue Operations</p>
+          </div>
+          <div class="text-left sm:text-right text-xs text-earth-700">
+            <p class="font-bold text-earth-900">Generated: ${today}</p>
+            <p>Prepared by: Shelter Administration</p>
+          </div>
+        </div>
+      `;
+
+      if (type === 'adoption-summary') {
+        box.innerHTML = `
+          ${headerHTML}
+          <h3 class="font-display font-bold text-lg text-earth-900 mb-3">Adoption Summary & Applications Report</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-center">
+            <div class="p-3 rounded-xl bg-cream-50 border border-cream-200"><div class="font-bold text-xl">${applications.length}</div><div class="text-xs">Total Applications</div></div>
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200"><div class="font-bold text-xl">${applications.filter(a => a.status === 'Pending').length}</div><div class="text-xs">Pending</div></div>
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-200"><div class="font-bold text-xl">${applications.filter(a => a.status === 'Approved').length}</div><div class="text-xs">Approved</div></div>
+            <div class="p-3 rounded-xl bg-sage-50 border border-sage-200"><div class="font-bold text-xl">${applications.filter(a => a.status === 'Completed').length}</div><div class="text-xs">Completed</div></div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-cream-100 border-b border-cream-200 font-bold">
+                  <th class="p-2.5">Ref ID</th>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Applicant</th>
+                  <th class="p-2.5">Barangay / Address</th>
+                  <th class="p-2.5">Pet</th>
+                  <th class="p-2.5">Method</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-cream-200">
+                ${applications.map(a => `
+                  <tr>
+                    <td class="p-2.5 font-mono font-bold">${a.refId}</td>
+                    <td class="p-2.5">${a.submissionDate}</td>
+                    <td class="p-2.5 font-semibold">${a.adopter.name}</td>
+                    <td class="p-2.5">${a.adopter.address}</td>
+                    <td class="p-2.5">${a.petName} (${a.petId})</td>
+                    <td class="p-2.5">${a.method}</td>
+                    <td class="p-2.5 font-bold">${a.status}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else if (type === 'animal-intake') {
+        box.innerHTML = `
+          ${headerHTML}
+          <h3 class="font-display font-bold text-lg text-earth-900 mb-3">Animal Intake & Medical Registry Report</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-cream-100 border-b border-cream-200 font-bold">
+                  <th class="p-2.5">Pet ID</th>
+                  <th class="p-2.5">Name & Species</th>
+                  <th class="p-2.5">Location Rescued</th>
+                  <th class="p-2.5">Date Rescued</th>
+                  <th class="p-2.5">Vaccination & Spay/Neuter</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-cream-200">
+                ${pets.map(p => `
+                  <tr>
+                    <td class="p-2.5 font-mono font-bold">${p.id}</td>
+                    <td class="p-2.5 font-semibold">${p.name} (${p.species} - ${p.sex})</td>
+                    <td class="p-2.5">${p.locationFound}</td>
+                    <td class="p-2.5">${p.dateRescued}</td>
+                    <td class="p-2.5">${p.medical.vaccination} | ${p.medical.spayNeuter}</td>
+                    <td class="p-2.5 font-bold">${p.status}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          ${headerHTML}
+          <h3 class="font-display font-bold text-lg text-earth-900 mb-3">Post-Adoption Welfare Monitoring Report</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-cream-100 border-b border-cream-200 font-bold">
+                  <th class="p-2.5">Log ID</th>
+                  <th class="p-2.5">Follow-Up Date</th>
+                  <th class="p-2.5">Pet</th>
+                  <th class="p-2.5">Adopter</th>
+                  <th class="p-2.5">Adjustment Status</th>
+                  <th class="p-2.5">Feedback & Concerns</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-cream-200">
+                ${postAdoptionLogs.map(l => `
+                  <tr>
+                    <td class="p-2.5 font-mono font-bold">${l.id}</td>
+                    <td class="p-2.5">${l.date}</td>
+                    <td class="p-2.5 font-semibold">${l.petName} (${l.petId})</td>
+                    <td class="p-2.5">${l.adopterName}</td>
+                    <td class="p-2.5 font-semibold">${l.adjustment}</td>
+                    <td class="p-2.5">${l.feedback} <em>(Concerns: ${l.concerns})</em></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    }
+
+    function refreshAllUI() {
+      updateHeroStats();
+      renderPublicPets();
+      updateAdminKPIs();
+      renderAdminPetsTable();
+      renderAdminApplications();
+      populatePostAdoptionPetDropdown();
+      renderAdminPostAdoptionLogs();
+      renderReportPreview();
+      lucide.createIcons();
+    }
+
+    // Initialize App on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      refreshAllUI();
+    });
+  </script>
+</body>
+</html>
