@@ -1,1060 +1,1353 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kalinga: Stray Pet Adoption System | Mamburao, Occidental Mindoro</title>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Plus Jakarta Sans', 'sans-serif'],
-          },
-          colors: {
-            cream: {
-              50: '#FDFBF7',
-              100: '#F7F3EB',
-              200: '#EFE6D5',
-            },
-            sage: {
-              50: '#F2F6F3',
-              100: '#E1ECE4',
-              200: '#C4D9CA',
-              500: '#4A7C59',
-              600: '#3B6648',
-              700: '#2E5038',
-            },
-            roseaccent: {
-              50: '#FFF5F5',
-              100: '#FFE3E3',
-              500: '#E53E3E',
-              600: '#C53030',
-            },
-            terracotta: {
-              50: '#FDF4F1',
-              100: '#FAE6DF',
-              500: '#D96B43',
-              600: '#C25630',
-            },
-            earth: {
-              700: '#4A3F35',
-              800: '#332B24',
-              900: '#1F1A16',
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalinga: Stray Pet Adoption System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kalinga: {
+                            50: '#fdf2f4',
+                            100: '#fbe7eb',
+                            200: '#f6d3d9',
+                            300: '#f0b4be',
+                            400: '#e58797',
+                            500: '#d55f74',
+                            600: '#c0445d',
+                            700: '#a2354c',
+                            800: '#872e41',
+                            900: '#732a39',
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    };
-  </script>
-  <style>
-    body {
-      background-color: #FDFBF7;
-      color: #332B24;
-    }
-    .nav-link-active {
-      color: #2E5038;
-      font-weight: 700;
-      border-bottom: 2px solid #4A7C59;
-    }
-    @media print {
-      body * { visibility: hidden; }
-      #printable-slip, #printable-slip * { visibility: visible; }
-      #printable-slip { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 20px; }
-      .no-print { display: none !important; }
-    }
-  </style>
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-roseaccent-100 selection:text-roseaccent-900">
+<body class="bg-kalinga-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchPage('home')">
+                    <div class="w-12 h-12 bg-kalinga-600 rounded-full flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-paw text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-bold tracking-tight text-kalinga-800">KALINGA</span>
+                        <p class="text-xs text-gray-500 font-medium">Stray Pet Adoption System • Mamburao</p>
+                    </div>
+                </div>
 
-  <!-- Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-cream-50/95 backdrop-blur-md border-b border-cream-200 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
-        <!-- Brand Logo -->
-        <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('home')">
-          <div class="w-11 h-11 rounded-2xl bg-sage-600 text-white flex items-center justify-center shadow-sm">
-            <i data-lucide="paw-print" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-display font-extrabold text-xl tracking-tight text-earth-900">KALINGA</span>
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-roseaccent-100 text-roseaccent-600">Mamburao</span>
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-6">
+                    <button onclick="switchPage('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-kalinga-600 bg-kalinga-100 transition">Home</button>
+                    <button onclick="switchPage('pets')" id="nav-pets" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-kalinga-600 hover:bg-kalinga-50 transition">Adopt a Pet</button>
+                    <button onclick="switchPage('about')" id="nav-about" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-kalinga-600 hover:bg-kalinga-50 transition">About Us</button>
+                    <button onclick="switchPage('contact')" id="nav-contact" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-kalinga-600 hover:bg-kalinga-50 transition">Contact Us</button>
+                </nav>
+
+                <!-- Auth / User Actions (Dedicated Page Links) -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <div id="auth-guest-section" class="flex items-center space-x-2">
+                        <button onclick="switchPage('login')" id="nav-login" class="nav-btn px-4 py-2 text-sm font-medium text-kalinga-600 hover:bg-kalinga-100 rounded-lg transition">Login</button>
+                        <button onclick="switchPage('register')" id="nav-register" class="nav-btn px-4 py-2 text-sm font-medium text-white bg-kalinga-600 hover:bg-kalinga-700 rounded-lg shadow-sm transition">Register</button>
+                    </div>
+                    <div id="auth-user-section" class="hidden flex items-center space-x-3">
+                        <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-btn relative p-2 text-gray-600 hover:text-kalinga-600 rounded-lg transition" title="My Applications">
+                            <i class="fa-solid fa-clipboard-list text-xl"></i>
+                            <span id="app-badge" class="absolute -top-1 -right-1 bg-kalinga-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                        </button>
+                        <div class="flex items-center space-x-2 bg-kalinga-100 px-3 py-1.5 rounded-full">
+                            <i class="fa-solid fa-user-circle text-kalinga-700 text-lg"></i>
+                            <span id="user-display-name" class="text-sm font-semibold text-kalinga-800">User</span>
+                        </div>
+                        <button onclick="logout()" class="text-gray-500 hover:text-red-600 text-sm font-medium px-2 py-1 transition" title="Logout">
+                            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-kalinga-600 focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
             </div>
-            <p class="text-xs text-earth-700 hidden sm:block">Stray Pet Adoption & Welfare System</p>
-          </div>
         </div>
 
-        <!-- Desktop Nav Links -->
-        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-earth-800">
-          <button onclick="switchView('home')" id="nav-home" class="transition hover:text-sage-700 pb-1">Home</button>
-          <button onclick="switchView('about')" id="nav-about" class="transition hover:text-sage-700 pb-1">About Us</button>
-          <button onclick="switchView('gallery')" id="nav-gallery" class="transition hover:text-sage-700 pb-1">Adopt Pets</button>
-          <button onclick="switchView('contact')" id="nav-contact" class="transition hover:text-sage-700 pb-1">Contact Us</button>
-          <button onclick="switchView('dashboard')" id="nav-dashboard" class="transition hover:text-sage-700 pb-1 hidden">My Applications</button>
-        </nav>
-
-        <!-- Auth / User Actions -->
-        <div class="flex items-center gap-3">
-          <div id="auth-guest-controls" class="flex items-center gap-2">
-            <button onclick="switchView('login')" class="px-4 py-2 rounded-xl text-sm font-semibold text-earth-800 hover:bg-cream-100 transition">Login</button>
-            <button onclick="switchView('register')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-sage-600 hover:bg-sage-700 text-white shadow-sm transition">Register</button>
-          </div>
-          <div id="auth-user-controls" class="hidden flex items-center gap-3">
-            <div class="flex items-center gap-2 bg-sage-50 px-3 py-1.5 rounded-xl border border-sage-100">
-              <div class="w-7 h-7 rounded-full bg-sage-600 text-white flex items-center justify-center text-xs font-bold" id="user-initials">U</div>
-              <span class="text-xs font-semibold text-earth-900" id="user-display-name">User</span>
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pt-2 pb-4 space-y-2 shadow-lg">
+            <button onclick="switchPage('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-kalinga-600 bg-kalinga-50">Home</button>
+            <button onclick="switchPage('pets'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Adopt a Pet</button>
+            <button onclick="switchPage('about'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">About Us</button>
+            <button onclick="switchPage('contact'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Contact Us</button>
+            <div id="mobile-auth-guest" class="pt-2 border-t flex flex-col space-y-2">
+                <button onclick="switchPage('login'); toggleMobileMenu();" class="w-full text-center px-4 py-2 border border-kalinga-600 text-kalinga-600 font-medium rounded-lg">Login</button>
+                <button onclick="switchPage('register'); toggleMobileMenu();" class="w-full text-center px-4 py-2 bg-kalinga-600 text-white font-medium rounded-lg">Register</button>
             </div>
-            <button onclick="handleLogout()" class="p-2 rounded-xl text-earth-700 hover:bg-roseaccent-50 hover:text-roseaccent-600 transition" title="Log Out">
-              <i data-lucide="log-out" class="w-5 h-5"></i>
-            </button>
-          </div>
-
-          <!-- Mobile Menu Toggle -->
-          <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-cream-100 text-earth-800">
-            <i data-lucide="menu" class="w-6 h-6"></i>
-          </button>
+            <div id="mobile-auth-user" class="hidden pt-2 border-t space-y-2">
+                <button onclick="switchPage('dashboard'); toggleMobileMenu();" class="w-full text-left px-3 py-2 text-kalinga-700 font-medium"><i class="fa-solid fa-clipboard-list mr-2"></i> My Applications</button>
+                <button onclick="logout(); toggleMobileMenu();" class="w-full text-left px-3 py-2 text-red-600 font-medium"><i class="fa-solid fa-right-from-bracket mr-2"></i> Logout</button>
+            </div>
         </div>
-      </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- PAGE 1: HOME -->
+        <div id="page-home" class="page-view">
+            <!-- Hero Section -->
+            <section class="relative bg-gradient-to-r from-kalinga-800 to-kalinga-600 text-white py-20 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Occidental Mindoro Stray Initiative</span>
+                        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">Give Homeless Pets a Second Chance at <span class="text-kalinga-200">Kalinga</span></h1>
+                        <p class="text-lg text-kalinga-100">Care, protection, and nurturing for abandoned dogs and cats across Mamburao and nearby barangays. Browse available rescues or schedule an in-person shelter visit today.</p>
+                        <div class="flex flex-wrap gap-4 pt-4">
+                            <button onclick="switchPage('pets')" class="px-6 py-3 bg-white text-kalinga-700 font-bold rounded-xl shadow-lg hover:bg-kalinga-50 transition transform hover:-translate-y-0.5"><i class="fa-solid fa-paw mr-2"></i> Browse Available Pets</button>
+                            <button onclick="switchPage('about')" class="px-6 py-3 bg-kalinga-700 text-white font-semibold rounded-xl border border-kalinga-500 hover:bg-kalinga-800 transition">Our Mission</button>
+                        </div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <div class="w-full max-w-md bg-white/10 p-6 rounded-3xl backdrop-blur-md border border-white/20 shadow-2xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-heart-pulse mr-2 text-kalinga-200"></i> Shelter Quick Stats</h3>
+                                <span class="text-xs bg-emerald-500 text-white px-2.5 py-1 rounded-full font-medium">Live System</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-center">
+                                <div class="bg-white/10 p-4 rounded-2xl">
+                                    <p class="text-3xl font-extrabold text-white" id="stat-available">15</p>
+                                    <p class="text-xs text-kalinga-200 mt-1">Rescues in Shelter</p>
+                                </div>
+                                <div class="bg-white/10 p-4 rounded-2xl">
+                                    <p class="text-3xl font-extrabold text-white">48</p>
+                                    <p class="text-xs text-kalinga-200 mt-1">Successfully Rehomed</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 bg-white/10 rounded-xl text-xs text-kalinga-100 flex items-center justify-between">
+                                <span><i class="fa-solid fa-location-dot mr-1"></i> Mamburao, Occ. Mindoro</span>
+                                <span class="font-semibold text-white">Open Mon-Sat</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Pets Section -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
+                    <div>
+                        <span class="text-kalinga-600 font-bold text-sm tracking-widest uppercase">Ready For Forever Homes</span>
+                        <h2 class="text-3xl font-bold text-gray-900 mt-1">Featured Rescued Pets</h2>
+                    </div>
+                    <button onclick="switchPage('pets')" class="mt-4 md:mt-0 text-kalinga-600 hover:text-kalinga-800 font-semibold flex items-center text-sm group">
+                        View All 15 Pets <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition"></i>
+                    </button>
+                </div>
+
+                <div id="featured-pets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="bg-white py-16 border-t border-b border-gray-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-2xl mx-auto mb-14">
+                        <span class="text-kalinga-600 font-bold text-sm tracking-widest uppercase">Simple & Transparent Process</span>
+                        <h2 class="text-3xl font-bold text-gray-900 mt-1">How Adoption Works</h2>
+                        <p class="text-gray-500 text-sm mt-2">Whether you prefer to apply online or visit our shelter in Mamburao, we make giving a stray a home seamless.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-kalinga-50 p-8 rounded-2xl border border-kalinga-100 text-center relative">
+                            <div class="w-14 h-14 bg-kalinga-600 text-white rounded-2xl flex items-center justify-center text-xl font-bold mx-auto mb-6 shadow-md">1</div>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">Browse & Select</h3>
+                            <p class="text-gray-600 text-sm">Explore complete profiles, medical histories, vaccination status, and temperaments of our 15 rescued dogs and cats.</p>
+                        </div>
+                        <div class="bg-kalinga-50 p-8 rounded-2xl border border-kalinga-100 text-center relative">
+                            <div class="w-14 h-14 bg-kalinga-600 text-white rounded-2xl flex items-center justify-center text-xl font-bold mx-auto mb-6 shadow-md">2</div>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">Apply or Schedule Visit</h3>
+                            <p class="text-gray-600 text-sm">Submit your adoption application online or book an appointment slip for an in-person shelter visit in Mamburao.</p>
+                        </div>
+                        <div class="bg-kalinga-50 p-8 rounded-2xl border border-kalinga-100 text-center relative">
+                            <div class="w-14 h-14 bg-kalinga-600 text-white rounded-2xl flex items-center justify-center text-xl font-bold mx-auto mb-6 shadow-md">3</div>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">Screening & Welcome Home</h3>
+                            <p class="text-gray-600 text-sm">Our shelter staff reviews details, coordinates final paperwork, and welcomes your new furry family member home!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE 2: ADOPT A PET (15 PETS GALLERY) -->
+        <div id="page-pets" class="page-view hidden">
+            <div class="bg-gradient-to-r from-kalinga-800 to-kalinga-600 text-white py-12 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto text-center">
+                    <h1 class="text-3xl font-extrabold">Meet Our 15 Rescued Animals</h1>
+                    <p class="mt-2 text-kalinga-100 text-sm max-w-xl mx-auto">Every pet listed here is cared for, vaccinated, and waiting for a loving family across Occidental Mindoro.</p>
+                </div>
+            </div>
+
+            <!-- Filters & Search Bar -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="relative w-full md:w-96">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-search"></i></span>
+                        <input type="text" id="pet-search" oninput="filterPets()" placeholder="Search by name, breed, or rescue location..." class="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500">
+                    </div>
+                    <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                        <select id="filter-species" onchange="filterPets()" class="px-4 py-2 border rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-kalinga-500">
+                            <option value="">All Species (15)</option>
+                            <option value="Dog">Dogs (10)</option>
+                            <option value="Cat">Cats (5)</option>
+                        </select>
+                        <select id="filter-status" onchange="filterPets()" class="px-4 py-2 border rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-kalinga-500">
+                            <option value="">All Status</option>
+                            <option value="Available">Available</option>
+                            <option value="Fostered">Fostered</option>
+                            <option value="Medical Care">Medical Care</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Pet Grid -->
+                <div id="all-pets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: ABOUT US -->
+        <div id="page-about" class="page-view hidden">
+            <div class="bg-gradient-to-r from-kalinga-800 to-kalinga-600 text-white py-16 px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl font-extrabold">About Kalinga</h1>
+                <p class="mt-2 text-kalinga-100 max-w-2xl mx-auto text-sm sm:text-base">Care, protection, and nurturing for stray and abandoned animals in Mamburao, Occidental Mindoro.</p>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+                <!-- Mission & Vision -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <span class="text-kalinga-600 font-bold text-sm tracking-widest uppercase">Our Core Purpose</span>
+                        <h2 class="text-3xl font-bold text-gray-900">Transforming Stray Animal Welfare in Occidental Mindoro</h2>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Kalinga was established to bridge the gap between rescued strays and compassionate families. Historically, local rescue efforts relied on manual paper logbooks and scattered social media posts. The Kalinga: Stray Pet Adoption System introduces a centralized digital platform to streamline rescue records, adoption applications, and shelter operations.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <i class="fa-solid fa-shield-heart text-kalinga-600 text-xl mb-2"></i>
+                                <h4 class="font-bold text-gray-900 text-sm">Protection & Care</h4>
+                                <p class="text-xs text-gray-500 mt-1">Safe temporary shelter and veterinary treatment.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <i class="fa-solid fa-handshake-angle text-kalinga-600 text-xl mb-2"></i>
+                                <h4 class="font-bold text-gray-900 text-sm">Transparent Process</h4>
+                                <p class="text-xs text-gray-500 mt-1">Clear online application and visit scheduling.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-md border border-kalinga-100 space-y-6">
+                        <h3 class="text-xl font-bold text-kalinga-800"><i class="fa-solid fa-bullseye mr-2"></i> Key Project Objectives</h3>
+                        <ul class="space-y-3 text-sm text-gray-700">
+                            <li class="flex items-start"><i class="fa-solid fa-circle-check text-kalinga-600 mt-1 mr-3"></i> Centralized digital database for animal profiles & medical records.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-circle-check text-kalinga-600 mt-1 mr-3"></i> Public web interface to browse pets and submit applications electronically.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-circle-check text-kalinga-600 mt-1 mr-3"></i> Administrative module for shelter staff to screen and review requests.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-circle-check text-kalinga-600 mt-1 mr-3"></i> Post-adoption tracking to ensure lifelong welfare and support.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Call to Action Card -->
+                <div class="bg-kalinga-800 text-white p-10 rounded-3xl text-center space-y-6 shadow-xl">
+                    <h2 class="text-3xl font-bold">Ready to Meet Your New Best Friend?</h2>
+                    <p class="text-kalinga-100 max-w-xl mx-auto text-sm">Browse our 15 available rescued dogs and cats or visit our shelter facility in Mamburao today.</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button onclick="switchPage('pets')" class="px-6 py-3 bg-white text-kalinga-800 font-bold rounded-xl shadow hover:bg-kalinga-50 transition">Browse Available Pets</button>
+                        <button onclick="switchPage('contact')" class="px-6 py-3 bg-kalinga-700 text-white font-semibold rounded-xl border border-kalinga-500 hover:bg-kalinga-600 transition">Contact Shelter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 4: CONTACT US -->
+        <div id="page-contact" class="page-view hidden">
+            <div class="bg-gradient-to-r from-kalinga-800 to-kalinga-600 text-white py-16 px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl font-extrabold">Get in Touch with Kalinga</h1>
+                <p class="mt-2 text-kalinga-100 max-w-xl mx-auto text-sm">Have questions about pet adoption, volunteering, or donations? We would love to hear from you.</p>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Contact Form -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Send Us a Message</h3>
+                        <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Your Full Name</label>
+                                <input type="text" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Juan Dela Cruz">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Email Address</label>
+                                <input type="email" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="juan@gmail.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Subject</label>
+                                <input type="text" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Adoption Inquiry / Volunteering">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Message</label>
+                                <textarea rows="4" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Type your message here..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow hover:bg-kalinga-700 transition">Send Message</button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="space-y-8">
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                            <h3 class="text-2xl font-bold text-gray-900">Shelter Information</h3>
+                            <div class="space-y-4 text-sm text-gray-600">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-kalinga-100 text-kalinga-600 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-location-dot"></i></div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">Shelter Location</p>
+                                        <p>Barangay Tayamaan / Payompon, Mamburao, Occidental Mindoro, Philippines</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-kalinga-100 text-kalinga-600 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-envelope"></i></div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">Email Us</p>
+                                        <p>support@kalingapets.org</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-kalinga-100 text-kalinga-600 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone"></i></div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">Helpline</p>
+                                        <p>+63 912 345 6789 / (043) 123-4567</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-kalinga-100 text-kalinga-600 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-clock"></i></div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">Visiting Hours</p>
+                                        <p>Monday – Saturday: 8:00 AM – 5:00 PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 5: SEPARATE DEDICATED LOGIN PAGE -->
+        <div id="page-login" class="page-view hidden">
+            <div class="min-h-[75vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+                <div class="max-w-md w-full bg-white rounded-3xl shadow-xl border border-kalinga-100 p-8 sm:p-10 space-y-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-kalinga-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-md">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-gray-900">Log In to Kalinga</h2>
+                        <p class="text-xs text-gray-500 mt-1">Access your adoption applications & shelter visit slips</p>
+                    </div>
+
+                    <!-- Redirect Notice Banner -->
+                    <div id="login-redirect-banner" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Please log in to continue with your pet adoption or shelter visit request.
+                    </div>
+
+                    <!-- Demo Account Helper -->
+                    <div class="p-3 bg-kalinga-50 rounded-xl border border-kalinga-100 flex items-center justify-between">
+                        <span class="text-xs text-kalinga-800 font-medium">Quick Test Login:</span>
+                        <button type="button" onclick="fillDemoLogin()" class="text-xs bg-kalinga-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-kalinga-700 transition">Fill Demo Account</button>
+                    </div>
+
+                    <form onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Email Address</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" id="login-email" required class="w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="juan.delacruz@gmail.com">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-semibold text-gray-600 uppercase">Password</label>
+                                <button type="button" onclick="openForgotPassword()" class="text-xs text-kalinga-600 hover:underline font-semibold">Forgot password?</button>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow-md hover:bg-kalinga-700 transition">Sign In</button>
+                    </form>
+
+                    <div class="pt-4 border-t text-center space-y-2">
+                        <p class="text-xs text-gray-500">
+                            Don't have an account yet? 
+                            <button onclick="switchPage('register')" class="text-kalinga-600 font-bold hover:underline ml-1">Create an Account</button>
+                        </p>
+                        <button onclick="switchPage('home')" class="text-xs text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Home</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 6: SEPARATE DEDICATED REGISTER PAGE -->
+        <div id="page-register" class="page-view hidden">
+            <div class="min-h-[75vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+                <div class="max-w-lg w-full bg-white rounded-3xl shadow-xl border border-kalinga-100 p-8 sm:p-10 space-y-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-kalinga-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-md">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-gray-900">Create Adopter Account</h2>
+                        <p class="text-xs text-gray-500 mt-1">Register to adopt rescued pets or schedule visits in Mamburao</p>
+                    </div>
+
+                    <form onsubmit="handleRegister(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Full Legal Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" id="reg-name" required class="w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Juan Dela Cruz">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Email Address</label>
+                                <input type="email" id="reg-email" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="juan@gmail.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Contact Number</label>
+                                <input type="text" id="reg-phone" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="09123456789">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Address (Barangay / Municipality)</label>
+                            <input type="text" id="reg-address" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Brgy. Tayamaan, Mamburao">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Password</label>
+                            <input type="password" id="reg-password" required minlength="6" class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Create a password (min. 6 characters)">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow-md hover:bg-kalinga-700 transition mt-2">Complete Registration</button>
+                    </form>
+
+                    <div class="pt-4 border-t text-center space-y-2">
+                        <p class="text-xs text-gray-500">
+                            Already registered? 
+                            <button onclick="switchPage('login')" class="text-kalinga-600 font-bold hover:underline ml-1">Log In Here</button>
+                        </p>
+                        <button onclick="switchPage('home')" class="text-xs text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Home</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 7: USER APPLICATIONS DASHBOARD -->
+        <div id="page-dashboard" class="page-view hidden">
+            <div class="bg-gradient-to-r from-kalinga-800 to-kalinga-600 text-white py-12 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-extrabold">My Adoption Applications & Visits</h1>
+                        <p class="mt-1 text-kalinga-100 text-sm">Track your submitted adoption requests and shelter visit appointment slips.</p>
+                    </div>
+                    <button onclick="switchPage('pets')" class="mt-4 md:mt-0 px-4 py-2 bg-white text-kalinga-700 font-bold rounded-xl text-sm shadow hover:bg-kalinga-50 transition"><i class="fa-solid fa-plus mr-1"></i> Adopt Another Pet</button>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div id="user-applications-list" class="space-y-6">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white pt-12 pb-8 border-t border-gray-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-kalinga-600 rounded-full flex items-center justify-center text-white">
+                        <i class="fa-solid fa-paw"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">KALINGA</span>
+                </div>
+                <p class="text-gray-400 text-xs leading-relaxed">A community-centered stray pet adoption initiative in Mamburao, Occidental Mindoro dedicated to care, protection, and nurturing.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-gray-200 uppercase tracking-wider mb-4">Navigation</h4>
+                <ul class="space-y-2 text-xs text-gray-400">
+                    <li><button onclick="switchPage('home')" class="hover:text-white transition">Home</button></li>
+                    <li><button onclick="switchPage('pets')" class="hover:text-white transition">Adopt a Pet (15 Rescues)</button></li>
+                    <li><button onclick="switchPage('about')" class="hover:text-white transition">About Us</button></li>
+                    <li><button onclick="switchPage('contact')" class="hover:text-white transition">Contact Us</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-gray-200 uppercase tracking-wider mb-4">Account Access</h4>
+                <ul class="space-y-2 text-xs text-gray-400">
+                    <li><button onclick="switchPage('login')" class="hover:text-white transition">Adopter Login</button></li>
+                    <li><button onclick="switchPage('register')" class="hover:text-white transition">Register New Account</button></li>
+                    <li><button onclick="switchPage('dashboard')" class="hover:text-white transition">Track My Applications</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-gray-200 uppercase tracking-wider mb-4">Emergency Hotline</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Report injured or abandoned strays in Mamburao through our 24/7 hotline support.</p>
+                <p class="text-kalinga-300 font-bold text-sm mt-2">+63 912 345 6789</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
+            &copy; 2026 Kalinga: Stray Pet Adoption System. All rights reserved. Mamburao, Occidental Mindoro.
+        </div>
+    </footer>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- PET DETAILS MODAL -->
+    <div id="petModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl transform transition-all my-8">
+            <div id="petModalContent">
+                <!-- Injected via JS -->
+            </div>
+        </div>
     </div>
 
-    <!-- Mobile Dropdown Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-cream-100 border-b border-cream-200 px-4 py-4 space-y-3">
-      <button onclick="switchView('home'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">Home</button>
-      <button onclick="switchView('about'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">About Us</button>
-      <button onclick="switchView('gallery'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">Adopt Pets</button>
-      <button onclick="switchView('contact'); toggleMobileMenu()" class="block w-full text-left font-medium text-earth-800 py-1.5">Contact Us</button>
-      <button onclick="switchView('dashboard'); toggleMobileMenu()" id="mobile-nav-dashboard" class="hidden block w-full text-left font-medium text-earth-800 py-1.5">My Applications</button>
-    </div>
-  </header>
-
-  <!-- ===================================================================== -->
-  <!-- VIEW 1: HOME PAGE                                                     -->
-  <!-- ===================================================================== -->
-  <div id="view-home" class="flex-1 view-section">
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-sage-50 via-cream-50 to-roseaccent-50 py-14 sm:py-20 border-b border-cream-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div class="lg:col-span-7 space-y-6">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-800 text-xs font-semibold">
-              <i data-lucide="heart" class="w-3.5 h-3.5 text-roseaccent-500 fill-roseaccent-500"></i>
-              <span>Care, Protection, and Nurturing in Mamburao, Occ. Mindoro</span>
-            </div>
-            <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-earth-900 leading-tight">
-              Give Homeless Strays a Safe Temporary Home & Loving Family.
-            </h1>
-            <p class="text-base sm:text-lg text-earth-700 leading-relaxed max-w-2xl">
-              <strong>Kalinga</strong> is your community-centered adoption initiative. Browse rescued dogs and cats with complete health records, submit adoption applications, or schedule shelter visits online.
-            </p>
-            <div class="flex flex-wrap items-center gap-3 pt-2">
-              <button onclick="switchView('gallery')" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
-                <i data-lucide="paw-print" class="w-4 h-4"></i>
-                <span>Browse Available Pets</span>
-              </button>
-              <button onclick="switchView('about')" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-cream-100 text-earth-800 font-semibold text-sm border border-cream-200 shadow-sm transition">
-                <i data-lucide="book-open" class="w-4 h-4 text-terracotta-600"></i>
-                <span>Our Mission & Story</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Impact Summary Card -->
-          <div class="lg:col-span-5">
-            <div class="bg-white/90 backdrop-blur rounded-3xl p-6 sm:p-8 border border-cream-200 shadow-xl space-y-6">
-              <div class="flex items-center justify-between border-b border-cream-200 pb-4">
+    <!-- ADOPTION / VISIT APPLICATION MODAL -->
+    <div id="adoptModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl transform transition-all my-8 p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-6">
                 <div>
-                  <h2 class="font-display font-bold text-lg text-earth-900">Mamburao Shelter Live Stats</h2>
-                  <p class="text-xs text-earth-700">Synchronized community database</p>
+                    <h3 class="text-xl font-bold text-gray-900" id="adoptModalTitle">Adopt / Visit Pet</h3>
+                    <p class="text-xs text-gray-500">Fill in your details for screening and confirmation</p>
                 </div>
-                <span class="w-3 h-3 rounded-full bg-sage-500 animate-pulse"></span>
-              </div>
-
-              <div class="grid grid-cols-3 gap-3 text-center">
-                <div class="p-4 rounded-2xl bg-sage-50 border border-sage-100">
-                  <div id="stat-available" class="font-display font-extrabold text-2xl sm:text-3xl text-sage-700">0</div>
-                  <div class="text-xs font-medium text-earth-700 mt-1">Available</div>
+                <button onclick="closeModal('adoptModal')" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="submitAdoptionApplication(event)" class="space-y-4">
+                <input type="hidden" id="form-pet-id">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Application Type</label>
+                    <select id="form-app-type" onchange="toggleAppTypeFields()" class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500 bg-white">
+                        <option value="Online Adoption">Online Adoption Application</option>
+                        <option value="Shelter Visit">Schedule In-Person Shelter Visit</option>
+                    </select>
                 </div>
-                <div class="p-4 rounded-2xl bg-cream-100 border border-cream-200">
-                  <div id="stat-rescued" class="font-display font-extrabold text-2xl sm:text-3xl text-earth-900">0</div>
-                  <div class="text-xs font-medium text-earth-700 mt-1">Rescued</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Full Legal Name</label>
+                        <input type="text" id="form-name" required class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Juan Dela Cruz">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Contact Number</label>
+                        <input type="text" id="form-phone" required class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="09123456789">
+                    </div>
                 </div>
-                <div class="p-4 rounded-2xl bg-roseaccent-50 border border-roseaccent-100">
-                  <div id="stat-adopted" class="font-display font-extrabold text-2xl sm:text-3xl text-roseaccent-600">0</div>
-                  <div class="text-xs font-medium text-earth-700 mt-1">Adopted</div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Complete Address (Mamburao / Occ. Mindoro)</label>
+                    <input type="text" id="form-address" required class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Brgy. Tayamaan, Mamburao">
                 </div>
-              </div>
-
-              <div class="bg-cream-50 rounded-2xl p-4 border border-cream-200 flex items-start gap-3">
-                <i data-lucide="shield-check" class="w-5 h-5 text-sage-600 shrink-0 mt-0.5"></i>
-                <p class="text-xs text-earth-700 leading-relaxed">
-                  Every animal undergoes complete veterinary vaccination, deworming, and temperament screening before being matched with loving families in Occidental Mindoro.
-                </p>
-              </div>
-            </div>
-          </div>
+                <div id="visit-date-container" class="hidden">
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Preferred Shelter Visit Date & Time</label>
+                    <input type="datetime-local" id="form-visit-datetime" class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500">
+                </div>
+                <div id="adoption-fields" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Household Type & Living Situation</label>
+                        <input type="text" id="form-household" class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Owned home, with fenced yard">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Reason for Adopting</label>
+                        <textarea rows="3" id="form-reason" class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="Tell us why you want to provide a forever home..."></textarea>
+                    </div>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow hover:bg-kalinga-700 transition">Submit Application / Appointment</button>
+                </div>
+            </form>
         </div>
-      </div>
-    </section>
-
-    <!-- Featured Adoptable Pets Preview -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Ready For Forever Homes</span>
-          <h2 class="font-display font-extrabold text-3xl text-earth-900 mt-2">Meet Our Featured Rescues</h2>
-        </div>
-        <button onclick="switchView('gallery')" class="inline-flex items-center gap-1.5 text-sm font-bold text-sage-700 hover:text-sage-800 transition">
-          <span>View All Pets Gallery</span>
-          <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div id="home-featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered dynamically -->
-      </div>
-    </section>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- VIEW 2: ABOUT US PAGE                                                 -->
-  <!-- ===================================================================== -->
-  <div id="view-about" class="flex-1 view-section hidden">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
-      <!-- Header -->
-      <div class="text-center space-y-4 max-w-3xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">About Kalinga</span>
-        <h1 class="font-display font-extrabold text-3xl sm:text-5xl text-earth-900">Care, Protection, and Nurturing</h1>
-        <p class="text-base sm:text-lg text-earth-700 leading-relaxed">
-          Kalinga is a community-centered stray pet adoption initiative serving Mamburao and nearby towns in Occidental Mindoro. We give homeless, abandoned, or stray dogs and cats a safe temporary shelter and match them with loving forever families.
-        </p>
-      </div>
-
-      <!-- Story & Problem Addressed -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div class="bg-white p-8 rounded-3xl border border-cream-200 shadow-sm space-y-4">
-          <div class="w-12 h-12 rounded-2xl bg-sage-50 text-sage-600 flex items-center justify-center">
-            <i data-lucide="heart-handshake" class="w-6 h-6"></i>
-          </div>
-          <h2 class="font-display font-bold text-2xl text-earth-900">Why Kalinga Was Built</h2>
-          <p class="text-sm text-earth-700 leading-relaxed">
-            Previously, animal rescue efforts in Mamburao relied entirely on handwritten logbooks, scattered social media posts, and physical shelter visits. Interested adopters from distant barangays faced major travel hurdles, and staff struggled with duplicate records. Kalinga digitizes the entire workflow.
-          </p>
-        </div>
-
-        <div class="bg-white p-8 rounded-3xl border border-cream-200 shadow-sm space-y-4">
-          <div class="w-12 h-12 rounded-2xl bg-roseaccent-50 text-roseaccent-600 flex items-center justify-center">
-            <i data-lucide="target" class="w-6 h-6"></i>
-          </div>
-          <h2 class="font-display font-bold text-2xl text-earth-900">Our Core Objectives</h2>
-          <ul class="space-y-2.5 text-sm text-earth-700">
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-sage-600 shrink-0 mt-0.5"></i> Centralized digital database for rescued animal profiles & medical records.</li>
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-sage-600 shrink-0 mt-0.5"></i> User-friendly public interface to browse pets and submit applications online.</li>
-            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-sage-600 shrink-0 mt-0.5"></i> Streamlined administrative screening and post-adoption welfare tracking.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Community & Barangays -->
-      <div class="bg-sage-600 text-white rounded-3xl p-8 sm:p-12 space-y-6 text-center">
-        <h2 class="font-display font-extrabold text-2xl sm:text-3xl">Serving Mamburao & Neighboring Barangays</h2>
-        <p class="text-sm sm:text-base text-sage-100 max-w-2xl mx-auto leading-relaxed">
-          From Brgy. Payompon and Poblacion to Balansay, Tayamaan, and Fatima — our volunteers and municipal partners work tirelessly to rescue, rehabilitate, and rehome stray animals across Occidental Mindoro.
-        </p>
-        <div class="pt-2">
-          <button onclick="switchView('gallery')" class="px-6 py-3.5 rounded-2xl bg-white text-sage-800 font-bold text-sm hover:bg-cream-100 transition shadow-sm">
-            Meet Our Rescues Today
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- ===================================================================== -->
-  <!-- VIEW 3: PET GALLERY & ADOPTION PAGE                                   -->
-  <!-- ===================================================================== -->
-  <div id="view-gallery" class="flex-1 view-section hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
-      <div>
-        <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Adoption Directory</span>
-        <h1 class="font-display font-extrabold text-3xl sm:text-4xl text-earth-900 mt-2">Find Your New Family Member</h1>
-        <p class="text-sm text-earth-700 mt-1">Browse verified health and temperament records of rescued dogs and cats in Mamburao.</p>
-      </div>
-
-      <!-- Filter Controls Bar -->
-      <div class="bg-white p-5 rounded-3xl border border-cream-200 shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div class="relative">
-            <i data-lucide="search" class="w-4 h-4 text-earth-700 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="gallery-search" oninput="renderGalleryPets()" placeholder="Search name, breed, barangay..." class="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-          </div>
-          <div>
-            <select id="gallery-species" onchange="renderGalleryPets()" class="w-full px-3.5 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none">
-              <option value="All">All Species (Dogs & Cats)</option>
-              <option value="Dog">Dogs Only</option>
-              <option value="Cat">Cats Only</option>
-            </select>
-          </div>
-          <div>
-            <select id="gallery-size" onchange="renderGalleryPets()" class="w-full px-3.5 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none">
-              <option value="All">All Sizes</option>
-              <option value="Small">Small</option>
-              <option value="Medium">Medium</option>
-              <option value="Large">Large</option>
-            </select>
-          </div>
-          <div>
-            <select id="gallery-status" onchange="renderGalleryPets()" class="w-full px-3.5 py-2.5 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none">
-              <option value="All">All Statuses</option>
-              <option value="Available" selected>Available for Adoption</option>
-              <option value="Fostered">In Foster Care</option>
-              <option value="Medical Care">Under Medical Care</option>
-              <option value="Adopted">Already Adopted</option>
-            </select>
-          </div>
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgotModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Reset Password</h3>
+                    <p class="text-xs text-gray-500">Recover access to your Kalinga account</p>
+                </div>
+                <button onclick="closeModal('forgotModal')" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <!-- Step 1: Email Input -->
+            <div id="forgot-step-1">
+                <form onsubmit="handleSendResetCode(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Registered Email Address</label>
+                        <input type="email" id="forgot-email" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="juan.delacruz@gmail.com">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow hover:bg-kalinga-700 transition">Send Reset Code</button>
+                </form>
+            </div>
+            <!-- Step 2: Code Verification & New Password -->
+            <div id="forgot-step-2" class="hidden space-y-4">
+                <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs">
+                    <i class="fa-solid fa-circle-check mr-1"></i> A 6-digit demo verification code has been sent to your email (<span id="reset-target-email" class="font-bold"></span>). For testing, use code: <strong class="underline">123456</strong>
+                </div>
+                <form onsubmit="handleVerifyAndReset(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">6-Digit Verification Code</label>
+                        <input type="text" id="reset-code" required maxlength="6" class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500 tracking-widest text-center font-bold text-lg" placeholder="123456">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">New Password</label>
+                        <input type="password" id="reset-new-password" required class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-kalinga-500" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow hover:bg-kalinga-700 transition">Update Password & Login</button>
+                </form>
+            </div>
         </div>
-      </div>
-
-      <!-- Pet Cards Grid -->
-      <div id="gallery-pet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered dynamically -->
-      </div>
     </div>
-  </div>
 
-  <!-- ===================================================================== -->
-  <!-- VIEW 4: CONTACT US PAGE                                               -->
-  <!-- ===================================================================== -->
-  <div id="view-contact" class="flex-1 view-section hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
-      <div class="text-center space-y-4 max-w-2xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Get In Touch</span>
-        <h1 class="font-display font-extrabold text-3xl sm:text-5xl text-earth-900">We’d Love to Hear From You</h1>
-        <p class="text-base text-earth-700">Have questions about adoption, volunteering, or donations in Mamburao? Reach out to our shelter team.</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Contact Information Cards -->
-        <div class="lg:col-span-5 space-y-4">
-          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-sage-50 text-sage-600 flex items-center justify-center shrink-0">
-              <i data-lucide="map-pin" class="w-6 h-6"></i>
+    <!-- APPLICATION SUCCESS SLIP MODAL -->
+    <div id="slipModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl p-6 sm:p-8 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900">Application Submitted!</h3>
+                <p class="text-xs text-gray-500">Your reference slip has been generated successfully.</p>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base text-earth-900">Shelter Location</h3>
-              <p class="text-sm text-earth-700 mt-1">Brgy. Payompon, Mamburao, Occidental Mindoro, Philippines</p>
+            <div id="slip-content" class="bg-kalinga-50 p-4 rounded-2xl border border-kalinga-100 text-sm space-y-3">
+                <!-- Generated details -->
             </div>
-          </div>
-
-          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-terracotta-50 text-terracotta-600 flex items-center justify-center shrink-0">
-              <i data-lucide="phone" class="w-6 h-6"></i>
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition text-sm"><i class="fa-solid fa-print mr-2"></i> Print Slip</button>
+                <button onclick="closeModal('slipModal'); switchPage('dashboard');" class="flex-1 py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow hover:bg-kalinga-700 transition text-sm">View Dashboard</button>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base text-earth-900">Contact Numbers</h3>
-              <p class="text-sm text-earth-700 mt-1">+63 917-555-0192 / +63 928-440-3321</p>
-            </div>
-          </div>
-
-          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-roseaccent-50 text-roseaccent-600 flex items-center justify-center shrink-0">
-              <i data-lucide="mail" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="font-display font-bold text-base text-earth-900">Email Address</h3>
-              <p class="text-sm text-earth-700 mt-1">kalinga.mamburao@gmail.com</p>
-            </div>
-          </div>
-
-          <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-cream-100 text-earth-800 flex items-center justify-center shrink-0">
-              <i data-lucide="clock" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="font-display font-bold text-base text-earth-900">Visiting Hours</h3>
-              <p class="text-sm text-earth-700 mt-1">Monday – Saturday: 8:00 AM – 5:00 PM</p>
-            </div>
-          </div>
         </div>
-
-        <!-- Contact Message Form -->
-        <div class="lg:col-span-7 bg-white p-8 sm:p-10 rounded-3xl border border-cream-200 shadow-sm">
-          <h2 class="font-display font-bold text-xl text-earth-900 mb-4">Send Us a Message</h2>
-          <form onsubmit="handleContactSubmit(event)" class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-semibold text-earth-800 mb-1">Your Full Name *</label>
-                <input type="text" required placeholder="Maria Santos" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
-                <input type="email" required placeholder="maria@example.com" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-earth-800 mb-1">Subject *</label>
-              <input type="text" required placeholder="Inquiry about pet adoption / volunteering" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-earth-800 mb-1">Message *</label>
-              <textarea rows="4" required placeholder="Type your message here..." class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500"></textarea>
-            </div>
-            <button type="submit" class="w-full py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
-              Send Message
-            </button>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- ===================================================================== -->
-  <!-- VIEW 5: LOGIN PAGE                                                    -->
-  <!-- ===================================================================== -->
-  <div id="view-login" class="flex-1 view-section hidden flex items-center justify-center py-12 px-4">
-    <div class="bg-white p-8 sm:p-10 rounded-3xl border border-cream-200 shadow-xl max-w-md w-full space-y-6">
-      <div class="text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-sage-600 text-white flex items-center justify-center mx-auto shadow-sm">
-          <i data-lucide="paw-print" class="w-6 h-6"></i>
-        </div>
-        <h2 class="font-display font-extrabold text-2xl text-earth-900">Welcome Back to Kalinga</h2>
-        <p class="text-xs text-earth-700">Log in to track your adoption applications and appointment slips.</p>
-      </div>
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // --- 15 PETS DATABASE ---
+        const petsData = [
+            {
+                id: 'PET-001',
+                name: 'Max',
+                species: 'Dog',
+                breed: 'Aspin / Mixed',
+                age: '1 year old',
+                gender: 'Male',
+                color: 'Brown & White',
+                size: 'Medium (14 kg)',
+                location: 'Brgy. Tayamaan, Mamburao',
+                status: 'Available',
+                temperament: 'Friendly, energetic, great with children and other dogs.',
+                medical: 'Fully vaccinated (Rabies/DHPP), dewormed, neutered.',
+                notes: 'Rescued near Sitio Aroma market. Very playful and affectionate.',
+                image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-002',
+                name: 'Luna',
+                species: 'Cat',
+                breed: 'Domestic Shorthair',
+                age: '8 months old',
+                gender: 'Female',
+                color: 'Calico / Orange-White',
+                size: 'Small (3.5 kg)',
+                location: 'Brgy. Payompon, Mamburao',
+                status: 'Available',
+                temperament: 'Calm, cuddly, indoor-trained, gentle purrer.',
+                medical: 'Vaccinated for Feline Distemper, dewormed, spayed.',
+                notes: 'Found seeking shelter outside local barangay hall during heavy rain.',
+                image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-003',
+                name: 'Bruno',
+                species: 'Dog',
+                breed: 'Labrador Mix',
+                age: '2 years old',
+                gender: 'Male',
+                color: 'Black',
+                size: 'Large (22 kg)',
+                location: 'Brgy. Balansay, Mamburao',
+                status: 'Available',
+                temperament: 'Loyal, protective, calm disposition, obedient.',
+                medical: 'Up-to-date vaccinations, treated for tick-borne wellness, neutered.',
+                notes: 'Gentle giant who loves long walks and belly rubs.',
+                image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-004',
+                name: 'Bella',
+                species: 'Dog',
+                breed: 'Aspin',
+                age: '6 months old',
+                gender: 'Female',
+                color: 'Golden Tan',
+                size: 'Small-Medium (9 kg)',
+                location: 'Brgy. Fatima, Mamburao',
+                status: 'Available',
+                temperament: 'Playful, curious, fast learner, loves treats.',
+                medical: 'First booster shots given, dewormed.',
+                notes: 'Rescued as a puppy with her siblings. Very affectionate.',
+                image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-005',
+                name: 'Simba',
+                species: 'Cat',
+                breed: 'Tabby',
+                age: '1 year old',
+                gender: 'Male',
+                color: 'Ginger Tabby',
+                size: 'Medium (4.2 kg)',
+                location: 'Brgy. Tayamaan, Mamburao',
+                status: 'Fostered',
+                temperament: 'Curious, independent yet affectionate when resting.',
+                medical: 'Fully vaccinated, dewormed, neutered.',
+                notes: 'Currently staying with a foster family in Tayamaan.',
+                image: 'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-006',
+                name: 'Rocky',
+                species: 'Dog',
+                breed: 'Aspin / Shepherd Mix',
+                age: '3 years old',
+                gender: 'Male',
+                color: 'Brindle',
+                size: 'Large (20 kg)',
+                location: 'Brgy. Payompon, Mamburao',
+                status: 'Available',
+                temperament: 'Watchful, gentle with family, energetic outdoors.',
+                medical: 'Complete annual shots, dewormed, neutered.',
+                notes: 'Strong and healthy companion for active households.',
+                image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-007',
+                name: 'Nala',
+                species: 'Cat',
+                breed: 'Siamese Mix',
+                age: '1.5 years old',
+                gender: 'Female',
+                color: 'Cream & Dark Points',
+                size: 'Small (3.8 kg)',
+                location: 'Brgy. Balansay, Mamburao',
+                status: 'Available',
+                temperament: 'Vocal, elegant, loves sitting by windows.',
+                medical: 'Vaccinated and spayed.',
+                notes: 'Very graceful cat who enjoys quiet environments.',
+                image: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-008',
+                name: 'Cooper',
+                species: 'Dog',
+                breed: 'Beagle Mix',
+                age: '2.5 years old',
+                gender: 'Male',
+                color: 'Tri-color (Tan, Black, White)',
+                size: 'Medium (12 kg)',
+                location: 'Brgy. Fatima, Mamburao',
+                status: 'Medical Care',
+                temperament: 'Friendly, scent-driven, loves exploring.',
+                medical: 'Undergoing skin treatment; recovering well.',
+                notes: 'Will be ready for adoption upon completion of topical treatment.',
+                image: 'https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-009',
+                name: 'Chloe',
+                species: 'Cat',
+                breed: 'Domestic Medium Hair',
+                age: '11 months old',
+                gender: 'Female',
+                color: 'Fluffy Grey & White',
+                size: 'Medium (4 kg)',
+                location: 'Brgy. Tayamaan, Mamburao',
+                status: 'Available',
+                temperament: 'Sweet-natured, fluffy, loves gentle brushing.',
+                medical: 'Fully vaccinated, dewormed, spayed.',
+                notes: 'Extremely soft coat and very lap-oriented.',
+                image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-010',
+                name: 'Charlie',
+                species: 'Dog',
+                breed: 'Terrier Mix',
+                age: '1.5 years old',
+                gender: 'Male',
+                color: 'Scruffy Cream',
+                size: 'Small (8 kg)',
+                location: 'Brgy. Poblacion 1, Mamburao',
+                status: 'Available',
+                temperament: 'Cheerful, alert, loves playing fetch.',
+                medical: 'Fully vaccinated, dewormed, neutered.',
+                notes: 'Great apartment or small-yard dog with big personality.',
+                image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-011',
+                name: 'Daisy',
+                species: 'Dog',
+                breed: 'Aspin',
+                age: '2 years old',
+                gender: 'Female',
+                color: 'White with Brown Spots',
+                size: 'Medium (13 kg)',
+                location: 'Brgy. Tangkalan, Mamburao',
+                status: 'Available',
+                temperament: 'Sweet, calm, walks nicely on a leash.',
+                medical: 'Vaccinated, dewormed, spayed.',
+                notes: 'Rescued along Tangkalan road; warms up quickly to kind voices.',
+                image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-012',
+                name: 'Milo',
+                species: 'Cat',
+                breed: 'Tuxedo Shorthair',
+                age: '9 months old',
+                gender: 'Male',
+                color: 'Black & White',
+                size: 'Small (3.9 kg)',
+                location: 'Brgy. Payompon, Mamburao',
+                status: 'Available',
+                temperament: 'Playful, loves feather toys, litter-trained.',
+                medical: 'Vaccinated, dewormed, neutered.',
+                notes: 'Dapper tuxedo markings and very sociable with visitors.',
+                image: 'https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-013',
+                name: 'Bantay',
+                species: 'Dog',
+                breed: 'Native Aspin',
+                age: '4 years old',
+                gender: 'Male',
+                color: 'Tan & Black Muzzle',
+                size: 'Medium (16 kg)',
+                location: 'Brgy. San Luis, Mamburao',
+                status: 'Available',
+                temperament: 'Devoted, steady, excellent family companion.',
+                medical: 'Annual boosters complete, heartworm negative, neutered.',
+                notes: 'A loyal older boy looking for a peaceful home.',
+                image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-014',
+                name: 'Molly',
+                species: 'Dog',
+                breed: 'Spitz / Aspin Mix',
+                age: '1 year old',
+                gender: 'Female',
+                color: 'Snow White',
+                size: 'Small (7.5 kg)',
+                location: 'Brgy. Poblacion 4, Mamburao',
+                status: 'Fostered',
+                temperament: 'Fluffy, bubbly, loves cuddling on couches.',
+                medical: 'Fully vaccinated, dewormed, spayed.',
+                notes: 'Currently in foster care; available for scheduled meet-and-greets.',
+                image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: 'PET-015',
+                name: 'Duke',
+                species: 'Dog',
+                breed: 'Hound / Aspin Mix',
+                age: '2 years old',
+                gender: 'Male',
+                color: 'Reddish Brown',
+                size: 'Large (21 kg)',
+                location: 'Brgy. Talabaan, Mamburao',
+                status: 'Available',
+                temperament: 'Athletic, smart, loves outdoor space and running.',
+                medical: 'Vaccinated, dewormed, neutered.',
+                notes: 'Rescued near Talabaan river; thrives with active owners.',
+                image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=600&q=80'
+            }
+        ];
 
-      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
-          <input type="email" id="login-email" required placeholder="e.g., maria@example.com" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Password *</label>
-          <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-        </div>
-        <button type="submit" class="w-full py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
-          Log In
-        </button>
-      </form>
+        let currentUser = JSON.parse(localStorage.getItem('kalinga_current_user')) || null;
+        let applications = JSON.parse(localStorage.getItem('kalinga_applications')) || [];
+        let pendingPetIdForAdopt = null;
 
-      <div class="text-center text-xs text-earth-700 border-t border-cream-200 pt-4">
-        Don't have an account yet? <button onclick="switchView('register')" class="font-bold text-sage-700 hover:underline">Register here</button>
-      </div>
-    </div>
-  </div>
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFeaturedPets();
+            renderAllPets();
+            updateAuthUI();
+            updateBadgeCount();
+        });
 
-  <!-- ===================================================================== -->
-  <!-- VIEW 6: REGISTER PAGE                                                 -->
-  <!-- ===================================================================== -->
-  <div id="view-register" class="flex-1 view-section hidden flex items-center justify-center py-12 px-4">
-    <div class="bg-white p-8 sm:p-10 rounded-3xl border border-cream-200 shadow-xl max-w-md w-full space-y-6">
-      <div class="text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-roseaccent-600 text-white flex items-center justify-center mx-auto shadow-sm">
-          <i data-lucide="user-plus" class="w-6 h-6"></i>
-        </div>
-        <h2 class="font-display font-extrabold text-2xl text-earth-900">Create Adopter Account</h2>
-        <p class="text-xs text-earth-700">Join Kalinga to rescue and adopt stray animals in Occidental Mindoro.</p>
-      </div>
+        // --- NAVIGATION & ROUTING ---
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
 
-      <form onsubmit="handleRegisterSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Full Legal Name *</label>
-          <input type="text" id="reg-name" required placeholder="Maria Clara Santos" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Email Address *</label>
-          <input type="email" id="reg-email" required placeholder="maria@example.com" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Password *</label>
-          <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-2xl bg-cream-50 border border-cream-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-        </div>
-        <button type="submit" class="w-full py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm shadow-sm transition">
-          Create Account
-        </button>
-      </form>
+            // Update active button state in navbar
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('text-kalinga-600', 'bg-kalinga-100', 'font-semibold');
+                if (!b.id.includes('register')) {
+                    b.classList.add('text-gray-600', 'font-medium');
+                }
+            });
+            const activeBtn = document.getElementById(`nav-${pageId}`);
+            if (activeBtn && !activeBtn.id.includes('register')) {
+                activeBtn.classList.remove('text-gray-600', 'font-medium');
+                activeBtn.classList.add('text-kalinga-600', 'bg-kalinga-100', 'font-semibold');
+            }
 
-      <div class="text-center text-xs text-earth-700 border-t border-cream-200 pt-4">
-        Already have an account? <button onclick="switchView('login')" class="font-bold text-sage-700 hover:underline">Log in</button>
-      </div>
-    </div>
-  </div>
+            // Show redirect banner on login page if user came from Adopt/Visit
+            const banner = document.getElementById('login-redirect-banner');
+            if (pageId === 'login' && pendingPetIdForAdopt) {
+                banner.classList.remove('hidden');
+            } else if (banner) {
+                banner.classList.add('hidden');
+            }
 
-  <!-- ===================================================================== -->
-  <!-- VIEW 7: MY APPLICATIONS DASHBOARD                                     -->
-  <!-- ===================================================================== -->
-  <div id="view-dashboard" class="flex-1 view-section hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">User Portal</span>
-          <h1 class="font-display font-extrabold text-3xl text-earth-900 mt-2">My Adoption Applications</h1>
-          <p class="text-sm text-earth-700 mt-1">Track your pending requests, shelter visit slips, and completed adoptions.</p>
-        </div>
-        <button onclick="switchView('gallery')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-sage-600 text-white text-sm font-semibold shadow-sm">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Adopt Another Pet</span>
-        </button>
-      </div>
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-      <div id="dashboard-applications-list" class="space-y-4">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
 
-  <!-- ===================================================================== -->
-  <!-- MODAL: PET FULL PROFILE & ADOPTION APPLICATION                        -->
-  <!-- ===================================================================== -->
-  <div id="modal-pet-detail" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
-      <div class="px-6 py-4 bg-cream-50 border-b border-cream-200 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span id="detail-pet-id" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-earth-800 text-white">KLG-001</span>
-          <span id="detail-pet-status" class="text-xs font-semibold px-2.5 py-1 rounded-full">Available</span>
-        </div>
-        <button onclick="closeModal('modal-pet-detail')" class="p-2 rounded-xl hover:bg-cream-200 text-earth-700">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div id="detail-pet-content" class="p-6 overflow-y-auto space-y-6">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
+        // --- MODAL CONTROLS ---
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
 
-  <!-- ===================================================================== -->
-  <!-- MODAL: APPLICATION FORM                                               -->
-  <!-- ===================================================================== -->
-  <div id="modal-apply" class="fixed inset-0 z-50 hidden bg-earth-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-cream-200 my-auto max-h-[92vh] flex flex-col">
-      <div class="px-6 py-4 bg-sage-700 text-white flex items-center justify-between">
-        <div>
-          <h3 class="font-display font-bold text-lg">Kalinga Adoption Application</h3>
-          <p id="apply-pet-subtitle" class="text-xs text-sage-100">Applying for Pet</p>
-        </div>
-        <button onclick="closeModal('modal-apply')" class="p-2 rounded-xl hover:bg-sage-600 text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
 
-      <form id="adoption-form" onsubmit="handleAdoptionSubmit(event)" class="p-6 overflow-y-auto space-y-4">
-        <input type="hidden" id="apply-pet-id" />
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-earth-700 mb-2">1. Engagement Method *</label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="cursor-pointer border-2 rounded-2xl p-3.5 flex items-start gap-3 transition has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 border-cream-200">
-              <input type="radio" name="adoptionMethod" value="Online Direct Application" checked onchange="toggleVisitDate()" class="mt-1 accent-sage-600" />
-              <div>
-                <div class="font-semibold text-sm text-earth-900">Online Direct Application</div>
-                <div class="text-xs text-earth-700 mt-0.5">Complete screening remotely.</div>
-              </div>
-            </label>
-            <label class="cursor-pointer border-2 rounded-2xl p-3.5 flex items-start gap-3 transition has-[:checked]:border-sage-600 has-[:checked]:bg-sage-50 border-cream-200">
-              <input type="radio" name="adoptionMethod" value="In-Person Shelter Visit" onchange="toggleVisitDate()" class="mt-1 accent-sage-600" />
-              <div>
-                <div class="font-semibold text-sm text-earth-900">Schedule Shelter Visit</div>
-                <div class="text-xs text-earth-700 mt-0.5">Book meet-and-greet in Payompon.</div>
-              </div>
-            </label>
-          </div>
-        </div>
+        // --- RENDER PETS ---
+        function renderFeaturedPets() {
+            const grid = document.getElementById('featured-pets-grid');
+            const featured = petsData.slice(0, 3);
+            grid.innerHTML = featured.map(pet => petCardHTML(pet)).join('');
+        }
 
-        <div id="visit-box" class="hidden bg-roseaccent-50 border border-roseaccent-100 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-earth-800 mb-1">Visit Date *</label>
-            <input type="date" id="apply-visit-date" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-sm" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-earth-800 mb-1">Time Slot *</label>
-            <select id="apply-visit-time" class="w-full px-3 py-2 rounded-xl bg-white border border-cream-200 text-sm">
-              <option value="09:00 AM - 10:30 AM">09:00 AM - 10:30 AM</option>
-              <option value="01:30 PM - 03:00 PM">01:30 PM - 03:00 PM</option>
-            </select>
-          </div>
-        </div>
+        function renderAllPets() {
+            const grid = document.getElementById('all-pets-grid');
+            const search = document.getElementById('pet-search').value.toLowerCase();
+            const species = document.getElementById('filter-species').value;
+            const status = document.getElementById('filter-status').value;
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-earth-800 mb-1">Full Legal Name *</label>
-            <input type="text" id="apply-name" required placeholder="Maria Clara Santos" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-earth-800 mb-1">Contact Number *</label>
-            <input type="tel" id="apply-phone" required placeholder="0917-555-0192" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
-          </div>
-        </div>
+            const filtered = petsData.filter(pet => {
+                const matchSearch = pet.name.toLowerCase().includes(search) || pet.breed.toLowerCase().includes(search) || pet.location.toLowerCase().includes(search);
+                const matchSpecies = species === '' || pet.species === species;
+                const matchStatus = status === '' || pet.status === status;
+                return matchSearch && matchSpecies && matchStatus;
+            });
 
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Complete Address / Barangay *</label>
-          <input type="text" id="apply-address" required placeholder="Brgy. Payompon, Mamburao, Occ. Mindoro" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
-        </div>
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500"><i class="fa-solid fa-paw text-4xl mb-3 text-kalinga-300"></i><p>No matching pets found.</p></div>`;
+                return;
+            }
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-earth-800 mb-1">Living Situation *</label>
-            <select id="apply-living" required class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm">
-              <option value="Owned House (Fenced Yard)">Owned House (Fenced Yard)</option>
-              <option value="Rented Home (Pet-Friendly)">Rented Home (Pet-Friendly)</option>
-              <option value="Apartment">Apartment</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-earth-800 mb-1">Previous Pet Experience *</label>
-            <input type="text" id="apply-exp" required placeholder="Raised Aspins for 5 years" class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm" />
-          </div>
-        </div>
+            grid.innerHTML = filtered.map(pet => petCardHTML(pet)).join('');
+        }
 
-        <div>
-          <label class="block text-xs font-semibold text-earth-800 mb-1">Reason for Adoption *</label>
-          <textarea id="apply-reason" rows="2" required placeholder="Tell us why you want to adopt..." class="w-full px-3 py-2 rounded-xl bg-cream-50 border border-cream-200 text-sm"></textarea>
-        </div>
+        function filterPets() {
+            renderAllPets();
+        }
 
-        <div class="flex justify-end gap-3 pt-3 border-t border-cream-200">
-          <button type="button" onclick="closeModal('modal-apply')" class="px-4 py-2 rounded-xl bg-cream-100 text-earth-800 text-sm font-semibold">Cancel</button>
-          <button type="submit" class="px-6 py-2 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold">Submit Application</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        function petCardHTML(pet) {
+            const statusColor = pet.status === 'Available' ? 'bg-emerald-500' : pet.status === 'Fostered' ? 'bg-blue-500' : 'bg-amber-500';
+            return `
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition flex flex-col justify-between">
+                    <div>
+                        <div class="relative h-56 overflow-hidden">
+                            <img src="${pet.image}" alt="${pet.name}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 right-3 ${statusColor} text-white text-xs font-bold px-3 py-1 rounded-full shadow">${pet.status}</span>
+                            <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full"><i class="fa-solid fa-tag mr-1"></i> ${pet.species}</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">${pet.name}</h3>
+                                    <p class="text-xs text-gray-500">${pet.breed} • ${pet.age}</p>
+                                </div>
+                                <span class="text-xs font-semibold px-2.5 py-1 bg-kalinga-50 text-kalinga-700 rounded-lg">${pet.gender}</span>
+                            </div>
+                            <p class="text-xs text-gray-600 line-clamp-2"><i class="fa-solid fa-location-dot text-kalinga-600 mr-1"></i> ${pet.location}</p>
+                            <p class="text-xs text-gray-700 line-clamp-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">"${pet.temperament}"</p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 grid grid-cols-2 gap-3">
+                        <button onclick="openPetDetails('${pet.id}')" class="py-2.5 px-3 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold rounded-xl text-xs transition text-center">View Profile</button>
+                        <button onclick="initiateAdopt('${pet.id}')" class="py-2.5 px-3 bg-kalinga-600 text-white hover:bg-kalinga-700 font-bold rounded-xl text-xs shadow transition text-center">Adopt / Visit</button>
+                    </div>
+                </div>
+            `;
+        }
 
-  <!-- Footer -->
-  <footer class="bg-earth-900 text-cream-100 mt-16 border-t border-earth-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-sage-600 text-white flex items-center justify-center">
-          <i data-lucide="paw-print" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <p class="font-display font-bold text-sm text-white">KALINGA: Stray Pet Adoption System</p>
-          <p class="text-xs text-cream-200">Brgy. Payompon, Mamburao, Occidental Mindoro</p>
-        </div>
-      </div>
-      <p class="text-xs text-cream-200 text-center sm:text-right">
-        Care, Protection, and Nurturing • Community Animal Welfare
-      </p>
-    </div>
-  </footer>
+        // --- PET DETAILS MODAL ---
+        function openPetDetails(petId) {
+            const pet = petsData.find(p => p.id === petId);
+            if (!pet) return;
+            const content = document.getElementById('petModalContent');
+            content.innerHTML = `
+                <div class="relative h-72">
+                    <img src="${pet.image}" class="w-full h-full object-cover">
+                    <button onclick="closeModal('petModal')" class="absolute top-4 right-4 w-9 h-9 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black transition"><i class="fa-solid fa-xmark"></i></button>
+                    <span class="absolute bottom-4 left-4 bg-kalinga-600 text-white text-xs font-bold px-3 py-1 rounded-full">${pet.status}</span>
+                </div>
+                <div class="p-6 sm:p-8 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">${pet.name}</h2>
+                            <p class="text-sm text-gray-500">${pet.breed} • ${pet.age} • ${pet.gender}</p>
+                        </div>
+                        <span class="text-xs font-semibold px-3 py-1 bg-kalinga-50 text-kalinga-700 rounded-xl"><i class="fa-solid fa-paw mr-1"></i> ID: ${pet.id}</span>
+                    </div>
 
-  <!-- ===================================================================== -->
-  <!-- JAVASCRIPT LOGIC                                                      -->
-  <!-- ===================================================================== -->
-  <script>
-    const STORAGE_KEYS = {
-      PETS: 'kalinga_app_pets_v1',
-      USERS: 'kalinga_app_users_v1',
-      CURRENT_USER: 'kalinga_app_current_user_v1',
-      APPLICATIONS: 'kalinga_app_applications_v1'
-    };
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="bg-gray-50 p-3 rounded-xl border"><p class="text-gray-400 font-semibold">SIZE / WEIGHT</p><p class="font-bold text-gray-800 mt-1">${pet.size}</p></div>
+                        <div class="bg-gray-50 p-3 rounded-xl border"><p class="text-gray-400 font-semibold">COLOR</p><p class="font-bold text-gray-800 mt-1">${pet.color}</p></div>
+                        <div class="bg-gray-50 p-3 rounded-xl border col-span-2 sm:col-span-1"><p class="text-gray-400 font-semibold">RESCUE LOCATION</p><p class="font-bold text-gray-800 mt-1">${pet.location}</p></div>
+                    </div>
 
-    const DEFAULT_PETS = [
-      {
-        id: 'KLG-001',
-        name: 'Tala',
-        species: 'Dog',
-        breed: 'Aspin',
-        age: '1.5 Years',
-        sex: 'Female',
-        color: 'Golden Tan',
-        size: 'Medium',
-        weight: '13.5 kg',
-        dateRescued: '2026-08-14',
-        locationFound: 'Brgy. Payompon, Mamburao',
-        temperament: 'Affectionate, gentle with kids',
-        status: 'Available',
-        themeBg: '#E1ECE4',
-        themeAccent: '#3B6648',
-        medical: { vaccination: 'Anti-Rabies & 5-in-1 Complete', deworming: 'Completed', spayNeuter: 'Spayed', vetNotes: 'Cleared by municipal vet.' }
-      },
-      {
-        id: 'KLG-002',
-        name: 'Muning',
-        species: 'Cat',
-        breed: 'Puspin',
-        age: '8 Months',
-        sex: 'Male',
-        color: 'Orange Tabby',
-        size: 'Small',
-        weight: '3.6 kg',
-        dateRescued: '2026-09-02',
-        locationFound: 'Brgy. Balansay, Mamburao',
-        temperament: 'Playful, litter-trained',
-        status: 'Available',
-        themeBg: '#FAE6DF',
-        themeAccent: '#C25630',
-        medical: { vaccination: 'Anti-Rabies Complete', deworming: 'Completed', spayNeuter: 'Neutered', vetNotes: 'Healthy and active.' }
-      },
-      {
-        id: 'KLG-003',
-        name: 'Bantay',
-        species: 'Dog',
-        breed: 'Aspin Mix',
-        age: '2 Years',
-        sex: 'Male',
-        color: 'Brindle',
-        size: 'Large',
-        weight: '18.2 kg',
-        dateRescued: '2026-07-21',
-        locationFound: 'Brgy. Tayamaan, Mamburao',
-        temperament: 'Loyal, alert, friendly',
-        status: 'Available',
-        themeBg: '#EFE6D5',
-        themeAccent: '#4A3F35',
-        medical: { vaccination: 'Anti-Rabies Complete', deworming: 'Completed', spayNeuter: 'Neutered', vetNotes: 'Strong and active.' }
-      }
-    ];
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-xs uppercase tracking-wider text-kalinga-700 mb-1">Temperament & Personality</h4>
+                            <p class="text-gray-600 bg-kalinga-50 p-3 rounded-xl">${pet.temperament}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-xs uppercase tracking-wider text-kalinga-700 mb-1">Medical & Vaccination Status</h4>
+                            <p class="text-gray-600 bg-gray-50 p-3 rounded-xl border">${pet.medical}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-xs uppercase tracking-wider text-kalinga-700 mb-1">Rescue Background Notes</h4>
+                            <p class="text-gray-600">${pet.notes}</p>
+                        </div>
+                    </div>
 
-    let pets = [];
-    let users = [];
-    let currentUser = null;
-    let applications = [];
+                    <div class="pt-4 border-t flex gap-3">
+                        <button onclick="closeModal('petModal')" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl text-sm hover:bg-gray-200 transition">Close</button>
+                        <button onclick="closeModal('petModal'); initiateAdopt('${pet.id}');" class="flex-1 py-3 bg-kalinga-600 text-white font-bold rounded-xl text-sm shadow hover:bg-kalinga-700 transition">Proceed to Adopt / Visit</button>
+                    </div>
+                </div>
+            `;
+            openModal('petModal');
+        }
 
-    function initStorage() {
-      const p = localStorage.getItem(STORAGE_KEYS.PETS);
-      const u = localStorage.getItem(STORAGE_KEYS.USERS);
-      const cu = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-      const a = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+        // --- ADOPTION & VISIT WORKFLOW ---
+        function initiateAdopt(petId) {
+            if (!currentUser) {
+                pendingPetIdForAdopt = petId;
+                switchPage('login');
+                return;
+            }
+            const pet = petsData.find(p => p.id === petId);
+            document.getElementById('adoptModalTitle').innerText = `Adopt or Visit: ${pet.name} (${pet.id})`;
+            document.getElementById('form-pet-id').value = pet.id;
+            document.getElementById('form-name').value = currentUser.name || '';
+            document.getElementById('form-phone').value = currentUser.phone || '';
+            document.getElementById('form-address').value = currentUser.address || '';
+            openModal('adoptModal');
+        }
 
-      pets = p ? JSON.parse(p) : DEFAULT_PETS;
-      users = u ? JSON.parse(u) : [{ name: 'Maria Santos', email: 'maria@example.com', password: 'password123' }];
-      currentUser = cu ? JSON.parse(cu) : null;
-      applications = a ? JSON.parse(a) : [
-        { refId: 'APP-2026-101', petId: 'KLG-001', petName: 'Tala', adopterName: 'Maria Santos', email: 'maria@example.com', date: '2026-11-10', method: 'Online Direct Application', status: 'Pending' }
-      ];
-      saveStorage();
-    }
+        function toggleAppTypeFields() {
+            const type = document.getElementById('form-app-type').value;
+            const visitContainer = document.getElementById('visit-date-container');
+            const adoptionFields = document.getElementById('adoption-fields');
+            if (type === 'Shelter Visit') {
+                visitContainer.classList.remove('hidden');
+                adoptionFields.classList.add('hidden');
+            } else {
+                visitContainer.classList.add('hidden');
+                adoptionFields.classList.remove('hidden');
+            }
+        }
 
-    function saveStorage() {
-      localStorage.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
-      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentUser));
-      localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(applications));
-    }
+        function submitAdoptionApplication(event) {
+            event.preventDefault();
+            const petId = document.getElementById('form-pet-id').value;
+            const pet = petsData.find(p => p.id === petId);
+            const appType = document.getElementById('form-app-type').value;
+            const name = document.getElementById('form-name').value;
+            const phone = document.getElementById('form-phone').value;
+            const address = document.getElementById('form-address').value;
+            const visitDatetime = document.getElementById('form-visit-datetime').value;
+            const household = document.getElementById('form-household').value;
+            const reason = document.getElementById('form-reason').value;
 
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const colors = { success: 'bg-sage-700 text-white', warning: 'bg-terracotta-600 text-white' };
-      toast.className = `p-4 rounded-2xl shadow-lg text-sm font-medium transition-all ${colors[type] || colors.success}`;
-      toast.textContent = message;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3500);
-    }
+            const newApp = {
+                id: 'KLG-' + Math.floor(100000 + Math.random() * 900000),
+                petId: pet.id,
+                petName: pet.name,
+                petImage: pet.image,
+                userEmail: currentUser.email,
+                appType: appType,
+                name: name,
+                phone: phone,
+                address: address,
+                visitDatetime: visitDatetime || 'N/A (Online Application)',
+                household: household || 'N/A',
+                reason: reason || 'N/A',
+                status: 'Pending Review',
+                dateSubmitted: new Date().toLocaleDateString()
+            };
 
-    function switchView(viewName) {
-      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-      const target = document.getElementById(`view-${viewName}`);
-      if (target) target.classList.remove('hidden');
+            applications.push(newApp);
+            localStorage.setItem('kalinga_applications', JSON.stringify(applications));
+            closeModal('adoptModal');
+            updateBadgeCount();
 
-      // Update Nav active states
-      ['home', 'about', 'gallery', 'contact', 'dashboard'].forEach(v => {
-        const btn = document.getElementById(`nav-${v}`);
-        if (btn) btn.className = v === viewName ? 'transition text-sage-700 font-bold pb-1 nav-link-active' : 'transition hover:text-sage-700 pb-1 text-earth-800';
-      });
+            // Show Slip Modal
+            const slipContent = document.getElementById('slip-content');
+            slipContent.innerHTML = `
+                <div class="flex justify-between border-b pb-2"><span class="text-gray-500">Reference ID:</span><span class="font-bold text-kalinga-800">${newApp.id}</span></div>
+                <div class="flex justify-between border-b pb-2"><span class="text-gray-500">Pet Requested:</span><span class="font-bold">${newApp.petName} (${newApp.petId})</span></div>
+                <div class="flex justify-between border-b pb-2"><span class="text-gray-500">Application Type:</span><span class="font-bold">${newApp.appType}</span></div>
+                <div class="flex justify-between border-b pb-2"><span class="text-gray-500">Applicant:</span><span class="font-bold">${newApp.name}</span></div>
+                <div class="flex justify-between border-b pb-2"><span class="text-gray-500">Contact Number:</span><span class="font-bold">${newApp.phone}</span></div>
+                ${newApp.appType === 'Shelter Visit' ? `<div class="flex justify-between border-b pb-2"><span class="text-gray-500">Visit Schedule:</span><span class="font-bold text-kalinga-700">${newApp.visitDatetime}</span></div>` : ''}
+                <div class="flex justify-between"><span class="text-gray-500">Status:</span><span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-0.5 rounded-full text-xs">Pending Review</span></div>
+            `;
+            openModal('slipModal');
+        }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      refreshUI();
-    }
+        // --- DEDICATED LOGIN & REGISTER HANDLERS ---
+        function fillDemoLogin() {
+            document.getElementById('login-email').value = 'juan.delacruz@gmail.com';
+            document.getElementById('login-password').value = 'kalinga123';
+        }
 
-    function toggleMobileMenu() {
-      const menu = document.getElementById('mobile-menu');
-      menu.classList.toggle('hidden');
-    }
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
 
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+            let users = JSON.parse(localStorage.getItem('kalinga_users')) || [];
+            let found = users.find(u => u.email === email && u.password === pass);
 
-    // Auth Handlers
-    function handleRegisterSubmit(event) {
-      event.preventDefault();
-      const name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim().toLowerCase();
-      const password = document.getElementById('reg-password').value;
+            if (!found && email === 'juan.delacruz@gmail.com' && pass === 'kalinga123') {
+                found = {
+                    name: 'Juan Dela Cruz',
+                    email: 'juan.delacruz@gmail.com',
+                    phone: '09123456789',
+                    address: 'Brgy. Tayamaan, Mamburao'
+                };
+            }
 
-      if (users.some(u => u.email === email)) {
-        showToast('Email already registered! Please login.', 'warning');
-        return;
-      }
+            if (found) {
+                currentUser = found;
+                localStorage.setItem('kalinga_current_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                updateBadgeCount();
 
-      const newUser = { name, email, password };
-      users.push(newUser);
-      currentUser = newUser;
-      saveStorage();
-      refreshUI();
-      switchView('dashboard');
-      showToast(`Welcome to Kalinga, ${name}! Account created.`);
-    }
+                if (pendingPetIdForAdopt) {
+                    const pid = pendingPetIdForAdopt;
+                    pendingPetIdForAdopt = null;
+                    switchPage('pets');
+                    initiateAdopt(pid);
+                } else {
+                    switchPage('home');
+                }
+            } else {
+                alert('Invalid email or password. You can click "Fill Demo Account" for testing.');
+            }
+        }
 
-    function handleLoginSubmit(event) {
-      event.preventDefault();
-      const email = document.getElementById('login-email').value.trim().toLowerCase();
-      const password = document.getElementById('login-password').value;
+        function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const phone = document.getElementById('reg-phone').value;
+            const address = document.getElementById('reg-address').value;
+            const password = document.getElementById('reg-password').value;
 
-      const user = users.find(u => u.email === email && u.password === password);
-      if (!user) {
-        showToast('Invalid email or password.', 'warning');
-        return;
-      }
+            let users = JSON.parse(localStorage.getItem('kalinga_users')) || [];
+            if (users.some(u => u.email === email)) {
+                alert('Email is already registered. Please log in.');
+                switchPage('login');
+                return;
+            }
 
-      currentUser = user;
-      saveStorage();
-      refreshUI();
-      switchView('dashboard');
-      showToast(`Welcome back, ${user.name}!`);
-    }
+            const newUser = { name, email, phone, address, password };
+            users.push(newUser);
+            localStorage.setItem('kalinga_users', JSON.stringify(users));
 
-    function handleLogout() {
-      currentUser = null;
-      saveStorage();
-      refreshUI();
-      switchView('home');
-      showToast('Logged out successfully.');
-    }
+            currentUser = newUser;
+            localStorage.setItem('kalinga_current_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            updateBadgeCount();
 
-    // SVG Illustration helper
-    function getPetSVG(pet) {
-      const isDog = pet.species === 'Dog';
-      const accent = pet.themeAccent || (isDog ? '#3B6648' : '#C25630');
-      if (isDog) {
-        return `<svg viewBox="0 0 120 120" class="w-28 h-28" fill="none"><circle cx="60" cy="60" r="54" fill="white" fill-opacity="0.7"/><rect x="34" y="34" width="52" height="54" rx="26" fill="white" stroke="${accent}" stroke-width="3.5"/><circle cx="48" cy="56" r="4" fill="#1F1A16"/><circle cx="72" cy="56" r="4" fill="#1F1A16"/><ellipse cx="60" cy="68" rx="13" ry="10" fill="#F7F3EB"/><path d="M55 65C55 63 65 63 65 65C65 68 61.5 70 60 70C58.5 70 55 68 55 65Z" fill="#1F1A16"/></svg>`;
-      } else {
-        return `<svg viewBox="0 0 120 120" class="w-28 h-28" fill="none"><circle cx="60" cy="60" r="54" fill="white" fill-opacity="0.7"/><path d="M35 48L31 24L52 38" fill="${accent}"/><path d="M85 48L89 24L68 38" fill="${accent}"/><rect x="32" y="36" width="56" height="50" rx="25" fill="white" stroke="${accent}" stroke-width="3.5"/><ellipse cx="47" cy="57" rx="3.8" ry="4.5" fill="#1F1A16"/><ellipse cx="73" cy="57" rx="3.8" ry="4.5" fill="#1F1A16"/><path d="M57 65H63L60 68.5L57 65Z" fill="#D96B43"/></svg>`;
-      }
-    }
+            if (pendingPetIdForAdopt) {
+                const pid = pendingPetIdForAdopt;
+                pendingPetIdForAdopt = null;
+                switchPage('pets');
+                initiateAdopt(pid);
+            } else {
+                switchPage('home');
+            }
+        }
 
-    // Render Pets in Gallery & Home
-    function renderGalleryPets() {
-      const search = document.getElementById('gallery-search')?.value.toLowerCase().trim() || '';
-      const species = document.getElementById('gallery-species')?.value || 'All';
-      const size = document.getElementById('gallery-size')?.value || 'All';
-      const status = document.getElementById('gallery-status')?.value || 'All';
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('kalinga_current_user');
+            updateAuthUI();
+            updateBadgeCount();
+            switchPage('home');
+        }
 
-      const filtered = pets.filter(p => {
-        const matchSearch = !search || p.name.toLowerCase().includes(search) || p.breed.toLowerCase().includes(search) || p.locationFound.toLowerCase().includes(search);
-        const matchSpecies = species === 'All' || p.species === species;
-        const matchSize = size === 'All' || p.size === size;
-        const matchStatus = status === 'All' || p.status === status;
-        return matchSearch && matchSpecies && matchSize && matchStatus;
-      });
+        function updateAuthUI() {
+            const guestSec = document.getElementById('auth-guest-section');
+            const userSec = document.getElementById('auth-user-section');
+            const mobileGuest = document.getElementById('mobile-auth-guest');
+            const mobileUser = document.getElementById('mobile-auth-user');
 
-      const grid = document.getElementById('gallery-pet-grid');
-      if (!grid) return;
+            if (currentUser) {
+                guestSec.classList.add('hidden');
+                userSec.classList.remove('hidden');
+                mobileGuest.classList.add('hidden');
+                mobileUser.classList.remove('hidden');
+                document.getElementById('user-display-name').innerText = currentUser.name;
+            } else {
+                guestSec.classList.remove('hidden');
+                userSec.classList.add('hidden');
+                mobileGuest.classList.remove('hidden');
+                mobileUser.classList.add('hidden');
+            }
+        }
 
-      if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full p-12 text-center bg-white rounded-3xl border border-cream-200"><p class="text-sm text-earth-700">No pets found matching your filter.</p></div>`;
-        return;
-      }
+        function updateBadgeCount() {
+            if (!currentUser) {
+                document.getElementById('app-badge').innerText = '0';
+                return;
+            }
+            const myApps = applications.filter(a => a.userEmail === currentUser.email);
+            document.getElementById('app-badge').innerText = myApps.length;
+            renderUserDashboard();
+        }
 
-      grid.innerHTML = filtered.map(pet => `
-        <div class="bg-white rounded-3xl border border-cream-200 shadow-sm overflow-hidden flex flex-col">
-          <div class="relative p-6 flex items-center justify-center" style="background-color: ${pet.themeBg || '#E1ECE4'}">
-            <span class="absolute top-3 left-3 text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-white/90 text-earth-800">${pet.id}</span>
-            <span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-sage-100 text-sage-800">${pet.status}</span>
-            ${getPetSVG(pet)}
-          </div>
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
-            <div>
-              <h3 class="font-display font-bold text-xl text-earth-900">${pet.name}</h3>
-              <p class="text-xs text-earth-700">${pet.breed} • ${pet.sex} • ${pet.age}</p>
-              <p class="text-xs text-earth-800 mt-2 bg-cream-50 p-2.5 rounded-xl border border-cream-200">"${pet.temperament}"</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-cream-200">
-              <button onclick="openPetDetail('${pet.id}')" class="px-3 py-2 rounded-xl bg-cream-100 text-earth-900 text-xs font-semibold">Full Profile</button>
-              <button onclick="openApplyModal('${pet.id}')" class="px-3 py-2 rounded-xl bg-sage-600 text-white text-xs font-semibold">Adopt / Visit</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
+        // --- FORGOT PASSWORD WORKFLOW ---
+        let resetEmailTarget = '';
+        function openForgotPassword() {
+            document.getElementById('forgot-step-1').classList.remove('hidden');
+            document.getElementById('forgot-step-2').classList.add('hidden');
+            openModal('forgotModal');
+        }
 
-    function renderHomeFeatured() {
-      const grid = document.getElementById('home-featured-grid');
-      if (!grid) return;
-      const featured = pets.filter(p => p.status === 'Available').slice(0, 3);
-      grid.innerHTML = featured.map(pet => `
-        <div class="bg-white rounded-3xl border border-cream-200 shadow-sm overflow-hidden flex flex-col">
-          <div class="relative p-6 flex items-center justify-center" style="background-color: ${pet.themeBg || '#E1ECE4'}">
-            <span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-sage-100 text-sage-800">${pet.status}</span>
-            ${getPetSVG(pet)}
-          </div>
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
-            <div>
-              <h3 class="font-display font-bold text-xl text-earth-900">${pet.name}</h3>
-              <p class="text-xs text-earth-700">${pet.breed} • ${pet.sex} • ${pet.age}</p>
-              <p class="text-xs text-earth-800 mt-2 bg-cream-50 p-2.5 rounded-xl border border-cream-200">"${pet.temperament}"</p>
-            </div>
-            <button onclick="openPetDetail('${pet.id}')" class="w-full py-2.5 rounded-xl bg-sage-600 text-white text-xs font-semibold">View Profile & Apply</button>
-          </div>
-        </div>
-      `).join('');
-    }
+        function handleSendResetCode(event) {
+            event.preventDefault();
+            resetEmailTarget = document.getElementById('forgot-email').value;
+            document.getElementById('reset-target-email').innerText = resetEmailTarget;
+            document.getElementById('forgot-step-1').classList.add('hidden');
+            document.getElementById('forgot-step-2').classList.remove('hidden');
+        }
 
-    function openPetDetail(petId) {
-      const pet = pets.find(p => p.id === petId);
-      if (!pet) return;
-      document.getElementById('detail-pet-id').textContent = pet.id;
-      document.getElementById('detail-pet-status').textContent = pet.status;
-      document.getElementById('detail-pet-content').innerHTML = `
-        <div class="flex items-center gap-4 p-4 rounded-2xl" style="background-color: ${pet.themeBg}">
-          ${getPetSVG(pet)}
-          <div>
-            <h2 class="font-display font-extrabold text-2xl text-earth-900">${pet.name}</h2>
-            <p class="text-xs text-earth-700">${pet.species} • ${pet.breed} • ${pet.age}</p>
-            <p class="text-xs font-semibold text-sage-800 mt-1">Rescued in: ${pet.locationFound}</p>
-          </div>
-        </div>
-        <div class="space-y-3 text-sm">
-          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
-            <strong>Medical & Care:</strong><br/>
-            Vaccination: ${pet.medical.vaccination}<br/>
-            Deworming: ${pet.medical.deworming}<br/>
-            Spay/Neuter: ${pet.medical.spayNeuter}<br/>
-            Vet Notes: ${pet.medical.vetNotes}
-          </div>
-          <div class="p-3 rounded-xl bg-cream-50 border border-cream-200">
-            <strong>Temperament:</strong> ${pet.temperament}
-          </div>
-        </div>
-        <div class="flex justify-end gap-3 pt-3 border-t border-cream-200">
-          <button onclick="closeModal('modal-pet-detail')" class="px-4 py-2 rounded-xl bg-cream-100 text-xs font-semibold">Close</button>
-          <button onclick="closeModal('modal-pet-detail'); openApplyModal('${pet.id}')" class="px-5 py-2 rounded-xl bg-sage-600 text-white text-xs font-semibold">Adopt / Visit</button>
-        </div>
-      `;
-      openModal('modal-pet-detail');
-    }
+        function handleVerifyAndReset(event) {
+            event.preventDefault();
+            const code = document.getElementById('reset-code').value;
+            const newPass = document.getElementById('reset-new-password').value;
 
-    function openApplyModal(petId) {
-      if (!currentUser) {
-        showToast('Please login or register first to submit an adoption application.', 'warning');
-        switchView('login');
-        return;
-      }
-      const pet = pets.find(p => p.id === petId);
-      if (!pet) return;
-      document.getElementById('adoption-form').reset();
-      document.getElementById('apply-pet-id').value = pet.id;
-      document.getElementById('apply-pet-subtitle').textContent = `Applying for: ${pet.name} (${pet.id})`;
-      document.getElementById('apply-name').value = currentUser.name;
-      document.getElementById('apply-email').value = currentUser.email;
-      openModal('modal-apply');
-    }
+            if (code !== '123456') {
+                alert('Invalid verification code. Please enter 123456 for demo recovery.');
+                return;
+            }
 
-    function toggleVisitDate() {
-      const method = document.querySelector('input[name="adoptionMethod"]:checked').value;
-      const box = document.getElementById('visit-box');
-      if (method === 'In-Person Shelter Visit') box.classList.remove('hidden');
-      else box.classList.add('hidden');
-    }
+            let users = JSON.parse(localStorage.getItem('kalinga_users')) || [];
+            let user = users.find(u => u.email === resetEmailTarget);
+            if (user) {
+                user.password = newPass;
+                localStorage.setItem('kalinga_users', JSON.stringify(users));
+            }
 
-    function handleAdoptionSubmit(event) {
-      event.preventDefault();
-      const petId = document.getElementById('apply-pet-id').value;
-      const pet = pets.find(p => p.id === petId);
-      const method = document.querySelector('input[name="adoptionMethod"]:checked').value;
+            closeModal('forgotModal');
+            alert('Password successfully reset! You can now log in with your new password.');
+            switchPage('login');
+        }
 
-      const newApp = {
-        refId: `APP-2026-${100 + applications.length + 1}`,
-        petId,
-        petName: pet.name,
-        adopterName: document.getElementById('apply-name').value,
-        email: currentUser.email,
-        date: new Date().toISOString().split('T')[0],
-        method,
-        status: 'Pending'
-      };
+        // --- USER DASHBOARD ---
+        function renderUserDashboard() {
+            const container = document.getElementById('user-applications-list');
+            if (!currentUser) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500"><p>Please log in to view your applications.</p></div>`;
+                return;
+            }
 
-      applications.unshift(newApp);
-      saveStorage();
-      closeModal('modal-apply');
-      refreshUI();
-      switchView('dashboard');
-      showToast(`Application ${newApp.refId} submitted successfully!`);
-    }
+            const myApps = applications.filter(a => a.userEmail === currentUser.email);
+            if (myApps.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-12 rounded-3xl text-center shadow-sm border border-gray-100 space-y-4">
+                        <i class="fa-solid fa-clipboard-question text-5xl text-kalinga-300"></i>
+                        <h3 class="text-xl font-bold text-gray-800">No Applications Yet</h3>
+                        <p class="text-sm text-gray-500 max-w-md mx-auto">You haven't submitted any adoption applications or scheduled any shelter visits yet. Browse our 15 rescued pets to get started!</p>
+                        <button onclick="switchPage('pets')" class="px-6 py-3 bg-kalinga-600 text-white font-bold rounded-xl shadow hover:bg-kalinga-700 transition text-sm">Browse Available Pets</button>
+                    </div>
+                `;
+                return;
+            }
 
-    function renderDashboard() {
-      const container = document.getElementById('dashboard-applications-list');
-      if (!container) return;
+            container.innerHTML = myApps.map(app => `
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-6">
+                    <img src="${app.petImage}" alt="${app.petName}" class="w-full md:w-40 h-36 object-cover rounded-2xl">
+                    <div class="flex-grow space-y-2 text-center md:text-left">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-kalinga-600">${app.id}</span>
+                                <h3 class="text-xl font-bold text-gray-900">${app.petName} (${app.petId})</h3>
+                            </div>
+                            <span class="px-3 py-1 bg-amber-100 text-amber-800 font-bold rounded-full text-xs inline-block">${app.status}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
+                            <p><strong class="text-gray-800">Type:</strong> ${app.appType}</p>
+                            <p><strong class="text-gray-800">Submitted:</strong> ${app.dateSubmitted}</p>
+                            <p><strong class="text-gray-800">Contact:</strong> ${app.phone}</p>
+                            <p><strong class="text-gray-800">Address:</strong> ${app.address}</p>
+                            ${app.appType === 'Shelter Visit' ? `<p class="col-span-2 text-kalinga-700 font-semibold"><i class="fa-solid fa-calendar-days mr-1"></i> Visit Schedule: ${app.visitDatetime}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 w-full md:w-auto">
+                        <button onclick="alert('Application Reference: ${app.id}\\nStatus: ${app.status}\\nOur shelter staff in Mamburao will review your submission shortly.')" class="px-4 py-2 bg-kalinga-50 text-kalinga-700 font-semibold rounded-xl text-xs hover:bg-kalinga-100 transition">View Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-      if (!currentUser) {
-        container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl border border-cream-200"><p class="text-sm text-earth-700">Please log in to view your applications.</p></div>`;
-        return;
-      }
-
-      const userApps = applications.filter(a => a.email === currentUser.email);
-      if (userApps.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl border border-cream-200"><p class="text-sm text-earth-700">You have no submitted adoption applications yet.</p></div>`;
-        return;
-      }
-
-      container.innerHTML = userApps.map(app => `
-        <div class="bg-white p-6 rounded-3xl border border-cream-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded bg-earth-800 text-white">${app.refId}</span>
-              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sage-100 text-sage-800">${app.status}</span>
-            </div>
-            <h3 class="font-display font-bold text-lg text-earth-900 mt-2">Pet: ${app.petName} (${app.petId})</h3>
-            <p class="text-xs text-earth-700">Method: ${app.method} • Submitted: ${app.date}</p>
-          </div>
-          <button onclick="showToast('Reference ID: ${app.refId} is currently under staff review.')" class="px-4 py-2 rounded-xl bg-cream-100 hover:bg-cream-200 text-earth-800 text-xs font-semibold">View Status Details</button>
-        </div>
-      `).join('');
-    }
-
-    function handleContactSubmit(event) {
-      event.preventDefault();
-      event.target.reset();
-      showToast('Thank you! Your message has been sent to Kalinga shelter staff.');
-    }
-
-    function refreshUI() {
-      // Stats
-      const avail = pets.filter(p => p.status === 'Available').length;
-      const adopted = pets.filter(p => p.status === 'Adopted').length;
-      if (document.getElementById('stat-available')) document.getElementById('stat-available').textContent = avail;
-      if (document.getElementById('stat-rescued')) document.getElementById('stat-rescued').textContent = pets.length;
-      if (document.getElementById('stat-adopted')) document.getElementById('stat-adopted').textContent = adopted;
-
-      // Auth controls
-      const guestCtrl = document.getElementById('auth-guest-controls');
-      const userCtrl = document.getElementById('auth-user-controls');
-      const dashNav = document.getElementById('nav-dashboard');
-      const mobileDashNav = document.getElementById('mobile-nav-dashboard');
-
-      if (currentUser) {
-        guestCtrl.classList.add('hidden');
-        userCtrl.classList.remove('hidden');
-        if (dashNav) dashNav.classList.remove('hidden');
-        if (mobileDashNav) mobileDashNav.classList.remove('hidden');
-        document.getElementById('user-display-name').textContent = currentUser.name;
-        document.getElementById('user-initials').textContent = currentUser.name.charAt(0).toUpperCase();
-      } else {
-        guestCtrl.classList.remove('hidden');
-        userCtrl.classList.add('hidden');
-        if (dashNav) dashNav.classList.add('hidden');
-        if (mobileDashNav) mobileDashNav.classList.add('hidden');
-      }
-
-      renderHomeFeatured();
-      renderGalleryPets();
-      renderDashboard();
-      lucide.createIcons();
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initStorage();
-      refreshUI();
-    });
-  </script>
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            alert('Thank you for reaching out to Kalinga! Your message has been sent to our Mamburao shelter staff.');
+            event.target.reset();
+        }
+    </script>
 </body>
 </html>
