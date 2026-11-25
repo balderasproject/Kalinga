@@ -3,10 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$host = 'localhost';
+$host = 'db';
 $dbname = 'kalinga_db';
 $username = 'root';
-$password = ''; // Default XAMPP password is empty
+$password = 'rootpassword';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
